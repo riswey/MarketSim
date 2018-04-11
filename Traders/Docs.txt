@@ -1,0 +1,28 @@
+﻿>Market
+List of commodities
+List of traders
+
+>Commodities
+have a type
+
+>Traders
+have a desire for each commodity
+
+
+>Exchange Mechanisms
+?How to abstract
+
+1) Window Shop
+Meet = Trader Round robin
+Compare = one-by-one
+
+Swap = highest desire wins
+
+2) Auction
+Meet = Trader Round robin
+Compare = one-by-one
+Swap = 
+
+3) Advanced Trader
+
+Swap = highest arbitrage wins

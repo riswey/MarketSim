@@ -1,0 +1,25 @@
+TODO:
+An owner of a trader either:
+>taxes the trader
+>gets access to all their comms and pays them a cut.
+
+In reality such a situation: either through force, agreement.
+Economy of scale must make a the owner of many traders, with more comms get a better price.
+THINK
+
+
+
+DOC:
+Number types initialised at start of model.
+
+Currently desire profile holds a %like for type in environment.
+
+Exchange as follows:
+Pair up.
+Try each comm with partner.
+They return a list they are prepared to trade.
+You select from list
+That exchange is performed. Can be cancelled at any point.
+
+They then have a chance to share with you. BUT actually will this ever result in a trade?
+
