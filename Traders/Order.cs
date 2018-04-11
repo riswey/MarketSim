@@ -29,8 +29,8 @@ namespace Traders
 
         public Trader t1;
         public Trader t2;
-        public Commodity c1;
-        public Commodity c2;
+        public I_Commodity c1;
+        public I_Commodity c2;
 
         public void Execute()
         {

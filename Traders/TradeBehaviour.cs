@@ -67,9 +67,9 @@ namespace Traders
 
             Order o = null;
 
-            foreach (Commodity c1 in t1.portfolio)
+            foreach (I_Commodity c1 in t1.portfolio)
             {
-                foreach (Commodity c2 in t2.portfolio)
+                foreach (I_Commodity c2 in t2.portfolio)
                 {
                     d1 = t1.DesireFor(c2) - t1.DesireFor(c1);
                     d2 = t2.DesireFor(c1) - t2.DesireFor(c2);
@@ -96,7 +96,7 @@ namespace Traders
 
         }
 
-        static public bool CommodityExchange(Commodity c1, Commodity c2)
+        static public bool CommodityExchange(I_Commodity c1, I_Commodity c2)
         {
             Trader t1 = c1.owner;
             Trader t2 = c2.owner;

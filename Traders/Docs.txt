@@ -9,20 +9,8 @@ have a type
 have a desire for each commodity
 
 
->Exchange Mechanisms
-?How to abstract
+=TODO
 
-1) Window Shop
-Meet = Trader Round robin
-Compare = one-by-one
+The whole idea is to get traders adding traders to portfolio
 
-Swap = highest desire wins
-
-2) Auction
-Meet = Trader Round robin
-Compare = one-by-one
-Swap = 
-
-3) Advanced Trader
-
-Swap = highest arbitrage wins
+Now we need to get a desire for Trader objects

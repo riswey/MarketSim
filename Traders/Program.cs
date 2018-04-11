@@ -26,7 +26,7 @@ namespace Traders
 
             Console.WriteLine("");
             world = new World(N_TRADERS, N_COM_TYPES, SIZE_PORTFOLIO);
-            world.Run<Commodity>(10, World.MeetRoundRobin, TraderBehaviour.CommodityExchange);
+            world.Run<I_Commodity>(10, World.MeetRoundRobin, TraderBehaviour.CommodityExchange);
 
             Console.ReadLine();
         }

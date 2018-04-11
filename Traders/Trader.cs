@@ -7,19 +7,24 @@ using System.Threading.Tasks;
 namespace Traders
 {
 
-    public partial class Trader
+    public partial class Trader: I_Commodity
     {
         static int ID = 0;
         public string myid { get; } = "T" + ID++;
 
         double[] desireProfile;
 
-        public List<Commodity> portfolio { get; }
+        public List<I_Commodity> portfolio { get; }
 
-        public Trader(List<Commodity> portfolio, double[] dp)
+        // I_Commodity
+        public int type { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Trader owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        //
+
+        public Trader(List<I_Commodity> portfolio, double[] dp)
         {
             desireProfile = dp;
-            foreach(Commodity c in portfolio)
+            foreach(I_Commodity c in portfolio)
             {
                 c.owner = this;
             }
@@ -36,33 +41,20 @@ namespace Traders
             return dp;
         }
 
-        public double DesireFor(Commodity c)
+        public double DesireFor(I_Commodity c)
         {
             return desireProfile[c.type];
         }
-        /*
-        public void SortPortfolio()
-        {
-            portfolio.Sort(delegate (Commodity c1, Commodity c2)
-            {
-                double d1 = desireFor(c1);
-                double d2 = desireFor(c2);
 
-                if (d1 == d2) return 0;
-                if (d1 < d2) return -1;
-                return 1;
-            });
-        }
-        */
         public double Satisfaction()
         {
             double sum = 0;
-            portfolio.ForEach(delegate (Commodity i) { sum += DesireFor(i); });
+            portfolio.ForEach(delegate (I_Commodity i) { sum += DesireFor(i); });
             return sum;
         }
 
         //Needs to be able public Take so can add commodities in setup
-        bool Take(Commodity c)
+        bool Take(I_Commodity c)
         {
             if (c.owner == null)
             {
@@ -76,13 +68,13 @@ namespace Traders
             return true;
         }
 
-        bool Release(Commodity c)
+        bool Release(I_Commodity c)
         {
             c.owner = null;
             return portfolio.Remove(c);
         }
 
-        public static void Exchange(Trader t1, Trader t2, Commodity c1, Commodity c2)
+        public static void Exchange(Trader t1, Trader t2, I_Commodity c1, I_Commodity c2)
         {
             t1.Release(c1);
             t2.Release(c2);
@@ -93,13 +85,27 @@ namespace Traders
 
         /*
         //REVIEW THESE
-        public List<Commodity> offerCommodity(Commodity com)
+
+        public void SortPortfolio()
         {
-            List<Commodity> myoffers = new List<Commodity>();
+            portfolio.Sort(delegate (I_Commodity c1, I_Commodity c2)
+            {
+                double d1 = desireFor(c1);
+                double d2 = desireFor(c2);
+
+                if (d1 == d2) return 0;
+                if (d1 < d2) return -1;
+                return 1;
+            });
+        }
+
+        public List<I_Commodity> offerCommodity(I_Commodity com)
+        {
+            List<I_Commodity> myoffers = new List<I_Commodity>();
 
             double target = desireFor(com);
 
-            foreach (Commodity c in portfolio)
+            foreach (I_Commodity c in portfolio)
             {
                 if (target >= desireFor(c))
                 {
@@ -111,7 +117,7 @@ namespace Traders
         }
 
         //TODO: return a list, pass back
-        public Commodity considerOffers(List<Commodity> ls)
+        public I_Commodity considerOffers(List<I_Commodity> ls)
         {
             //no offers
             if (ls.Count == 0) return null;
@@ -148,18 +154,18 @@ namespace Traders
 
         public void tradePortfolioTo(Trader t)
         {
-            List<Commodity> ls;
+            List<I_Commodity> ls;
 
             //list my own stock. My portfolio will be changed by the operation
             var pf = new Commodity[portfolio.Count];
             portfolio.CopyTo(pf);
 
-            foreach (Commodity c in pf)
+            foreach (I_Commodity c in pf)
             {
                 //Offer all my commodities 
                 ls = t.offerCommodity(c);
                 //give offers to customer
-                Commodity swap = considerOffers(ls);
+                I_Commodity swap = considerOffers(ls);
 
                 if (swap != null)
                 {

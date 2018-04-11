@@ -19,8 +19,8 @@ namespace Traders
         }
 
         void Init(double[] dp1, double[] dp2) {
-            t1 = new Trader(new List<Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp1);
-            t2 = new Trader(new List<Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp2);
+            t1 = new Trader(new List<I_Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp1);
+            t2 = new Trader(new List<I_Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp2);
         }
 
         [TestCleanup()]
@@ -80,8 +80,8 @@ namespace Traders
             //t1 has 2x 
             Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
 
-            Commodity c;
-            List<Commodity> offers;
+            I_Commodity c;
+            List<I_Commodity> offers;
             /*
             c = new Commodity(0);
             offers = t1.offerCommodity(c);
@@ -107,9 +107,9 @@ namespace Traders
             //t1 has 2x 
             Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
 
-            List<Commodity> ls = new List<Commodity>() {new Commodity(0)};
+            List<I_Commodity> ls = new List<I_Commodity>() {new Commodity(0)};
             /*
-            Commodity swap = t1.considerOffers( ls );
+            I_Commodity swap = t1.considerOffers( ls );
             Assert.AreEqual(null, swap);
 
             ls.Clear();

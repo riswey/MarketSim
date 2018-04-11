@@ -22,7 +22,7 @@ namespace Traders
         int NUM_COM_TYPES;
         int PORTFOLIO_SIZE;
 
-        public List<Commodity> commodities = new List<Commodity>();
+        public List<I_Commodity> commodities = new List<I_Commodity>();
         public List<Trader> traders = new List<Trader>();
 
         //Give all traders same portfolio size in this model
@@ -35,7 +35,7 @@ namespace Traders
 
             for (int i = 0; i < n_traders; i++)
             {
-                List<Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
+                List<I_Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
                 double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
                 traders.Add(new Trader(portfolio, dp) );
                 commodities.AddRange(portfolio);
@@ -70,7 +70,7 @@ namespace Traders
                 {
                     MeetMethod(traders as List<T>, TradeMethod);
                 }
-                else if (typeof(T) == typeof(Commodity))
+                else if (typeof(T) == typeof(I_Commodity))
                 {
                     MeetMethod(commodities as List<T>, TradeMethod);
                 }
