@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace Traders
 {
-    public class Commodity
+    public interface I_Commodity
+    {
+        static int ID = 0;
+        string myid { get; }
+        int type { get; set; }
+        Trader owner { get; set; }
+    }
+
+
+    public class Commodity: I_Commodity
     {
         static int ID = 0;
         public string myid { get; } = "C" + ID++;
@@ -19,13 +28,13 @@ namespace Traders
             type = t;
         }
 
-        public static Commodity NewRandomCommodity(Random rnd, int t)
+        public static Commodity NewRandomCommodity(MyRandom rnd, int t)
         {
             return new Commodity(rnd.Next(t));
 
         }
 
-        public static List<Commodity> ListRandomCommodities(Random rnd, int size, int n_com_types)
+        public static List<Commodity> ListRandomCommodities(MyRandom rnd, int size, int n_com_types)
         {
             List<Commodity> coms = new List<Commodity>();
             for (int i = 0; i < size; i++)

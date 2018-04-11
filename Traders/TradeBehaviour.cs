@@ -15,13 +15,8 @@ namespace Traders
         static public bool RandomExchange(Trader t1, Trader t2)
         {
             int size = t1.portfolio.Count;
-
-            //do a random swap;
-
             int pos = World.rnd.Next(size);
-
             Trader.Exchange(t1, t2, t1.portfolio[pos], t2.portfolio[pos]);
-
             return true;
         }
 
@@ -66,32 +61,36 @@ namespace Traders
 
         }
 
-        public bool CigaretteCardSwaps(Trader seller, Trader buyer)
+        public static bool MutualMaxSwap(Trader t1, Trader t2)
         {
+            double d1, d2, mag, arg, max = 0;
 
-            double dpcc;
-            double dpcd;
-            double dpdc;
-            double dpdd;
+            Order o = null;
 
-            foreach (Commodity c in seller.portfolio)
+            foreach (Commodity c1 in t1.portfolio)
             {
-                foreach (Commodity d in buyer.portfolio)
+                foreach (Commodity c2 in t2.portfolio)
                 {
-                    dpcc = seller.DesireFor(c);
-                    dpcd = seller.DesireFor(d);
-                    dpdc = buyer.DesireFor(c);
-                    dpdd = buyer.DesireFor(d);
+                    d1 = t1.DesireFor(c2) - t1.DesireFor(c1);
+                    d2 = t2.DesireFor(c1) - t2.DesireFor(c2);
 
-                    if (dpcd > dpcc && dpdc > dpdd)
+                    //ignore -ve values (don;t allow get -ve)
+                    if (d1 < 0 || d2 < 0) continue;
+
+                    mag = d1 * d1 + d2 * d2;
+                    if (mag > max)
                     {
-                        //They agreed
-                        Console.WriteLine( seller.myid + "," + buyer.myid + "," + c.myid + d.myid );
-                        //Order.collection.Add(new Order() { t1 = seller, t2 = buyer, c1 = c, c2 = d, type = Order.ORDERTYPE.SWAP });
+                        max = mag;
+                        o = new Order() { t1 = t1, t2 = t2, c1 = c1, c2 = c2 };
                     }
                 }
             }
-            Order.ExecuteOrders();
+
+            if (o != null)
+            {
+                Order.collection.Add(o);
+                Order.ExecuteOrders();
+            }
 
             return true;
 

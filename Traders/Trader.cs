@@ -26,7 +26,7 @@ namespace Traders
             this.portfolio = portfolio;
         }
 
-        public static double[] RandomDesireProfile(Random rnd, int n_com_types)
+        public static double[] RandomDesireProfile(MyRandom rnd, int n_com_types)
         {
             var dp = new double[n_com_types];
             for (int i = 0; i < n_com_types; i++)

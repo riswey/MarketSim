@@ -36,5 +36,10 @@ namespace Traders
         {
             Trader.Exchange(t1,t2,c1,c2);            
         }
+
+        public string ToString()
+        {
+            return t1.DesireFor(c1) + "->" + t1.DesireFor(c2) + "," + t2.DesireFor(c2) + "->" + t2.DesireFor(c1);
+        }
     }
 }

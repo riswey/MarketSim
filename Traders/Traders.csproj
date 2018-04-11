@@ -49,7 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commodity.cs" />
-    <Compile Include="CommodityBehaviour.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="MyRandom.cs" />
     <Compile Include="TradeBehaviour.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="World.cs" />

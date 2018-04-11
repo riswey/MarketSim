@@ -16,7 +16,7 @@ namespace Traders
 
     partial class World
     {
-        public static Random rnd = new Random();
+        static public MyRandom rnd = new MyRandom();
 
         //Who is in this world
         int NUM_COM_TYPES;
@@ -28,10 +28,10 @@ namespace Traders
         //Give all traders same portfolio size in this model
         public World(int n_traders, int n_com_types, int pf_size)
         {
+            rnd.Reset();
+
             NUM_COM_TYPES = n_com_types;
             PORTFOLIO_SIZE = pf_size;
-
-            Commodity com;
 
             for (int i = 0; i < n_traders; i++)
             {
@@ -60,10 +60,10 @@ namespace Traders
             }
         }
 
-        public bool Run<T>(Action<List<T>, D_TradeMethod<T>> MeetMethod, D_TradeMethod<T> TradeMethod)
+        public bool Run<T>(int loops, Action<List<T>, D_TradeMethod<T>> MeetMethod, D_TradeMethod<T> TradeMethod)
         {
             int i = 0;
-            while (i++ < 10) {
+            while (i++ < loops) {
                 Console.WriteLine(WorldSatisfaction());
 
                 if (typeof(T) == typeof(Trader))
