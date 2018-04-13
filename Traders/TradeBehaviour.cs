@@ -8,22 +8,23 @@ namespace Traders
 {
     /// <summary>
     /// Static collection of Trader behaviours
+    /// 
+    /// Portfolios may be different sizes
     /// </summary>
     class TraderBehaviour
     {
 
         static public bool RandomExchange(Trader t1, Trader t2)
         {
-            int size = t1.portfolio.Count;
-            int pos = World.rnd.Next(size);
-            Trader.Exchange(t1, t2, t1.portfolio[pos], t2.portfolio[pos]);
+            int pos1 = World.rnd.Next(t1.portfolio.Count);
+            int pos2 = World.rnd.Next(t2.portfolio.Count);
+            Trader.Exchange(t1, t2, t1.portfolio[pos1], t2.portfolio[pos2]);
             return true;
         }
 
+        //TODO: not finished
         static public bool OptimalExchange(Trader t1, Trader t2)
         {
-            int size = t1.portfolio.Count;
-
             //sort by desire profile of 
             List<double> desires11 = new List<double>();
             List<double> desires12 = new List<double>();
@@ -31,12 +32,15 @@ namespace Traders
             List<double> desires22 = new List<double>();
 
             //get a list of desires
-            for (int i = 0; i < size; i++)
+            foreach(I_Commodity c in t1.portfolio)
             {
-                desires11.Add(t1.DesireFor(t1.portfolio[i]) );
-                desires12.Add(t1.DesireFor(t2.portfolio[i]));
-                desires21.Add(t2.DesireFor(t1.portfolio[i]));
-                desires22.Add(t2.DesireFor(t2.portfolio[i]));
+                desires11.Add(t1.DesireFor(c));
+                desires21.Add(t2.DesireFor(c));
+            }
+            foreach (I_Commodity c in t2.portfolio)
+            {
+                desires12.Add(t1.DesireFor(c));
+                desires22.Add(t2.DesireFor(c));
             }
 
             //Ascending
@@ -45,16 +49,21 @@ namespace Traders
             desires21.Sort();
             desires22.Sort();
 
-            for (int i = size; i < 0; i--)
-            {
+
+            int p1 = desires11.Count;
+            int p2 = desires12.Count;
+            
+            while (p1 > 0 && p2 > 0) {
                 if (
-                    desires12[i] > desires11[i]     //I desire your top item more than my top item
+                    desires12[p1] > desires11[p1]     //I desire your top item more than my top item
                     &&
-                    desires21[i] > desires22[i]     //You desire my top item more than your top item
+                    desires21[p2] > desires22[p2]     //You desire my top item more than your top item
                     )
                 {
 
                 }
+
+                --p1;--p2;
             }
 
             return true;

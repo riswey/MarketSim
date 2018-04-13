@@ -9,16 +9,18 @@ namespace Traders
 
     public partial class Trader: I_Commodity
     {
+        const int TRADER_TYPE = -1;
+
         static int ID = 0;
         public string myid { get; } = "T" + ID++;
 
         double[] desireProfile;
 
-        public List<I_Commodity> portfolio { get; }
+        public List<I_Commodity> portfolio { get; } = new List<I_Commodity>();
 
         // I_Commodity
-        public int type { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Trader owner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int type { get; set; } = TRADER_TYPE; 
+        public Trader owner { get; set; } = null;   //free
         //
 
         public Trader(List<I_Commodity> portfolio, double[] dp)
@@ -26,9 +28,8 @@ namespace Traders
             desireProfile = dp;
             foreach(I_Commodity c in portfolio)
             {
-                c.owner = this;
+                Take(c);
             }
-            this.portfolio = portfolio;
         }
 
         public static double[] RandomDesireProfile(MyRandom rnd, int n_com_types)
@@ -43,18 +44,38 @@ namespace Traders
 
         public double DesireFor(I_Commodity c)
         {
-            return desireProfile[c.type];
+            if (c.type != TRADER_TYPE)
+            {
+                return desireProfile[c.type];
+            }
+            else
+            {
+                //TODO: BEWARE: Trader -> Trader can form a loop
+                //Half the satisfaction has been set aside for me already so this is mine 
+                return ((Trader)c).Satisfaction();
+            }
         }
 
         public double Satisfaction()
         {
-            double sum = 0;
-            portfolio.ForEach(delegate (I_Commodity i) { sum += DesireFor(i); });
-            return sum;
+            double sum = 0.0;
+            foreach(I_Commodity c in portfolio)
+            {
+                sum += DesireFor(c);
+            }
+
+            //If has a capitalist then half will go to them so return only half
+            if (owner != null)
+            {
+                return sum / 2;
+            } else {
+                //Free
+                return sum;
+            }
         }
 
         //Needs to be able public Take so can add commodities in setup
-        bool Take(I_Commodity c)
+        public bool Take(I_Commodity c)
         {
             if (c.owner == null)
             {
@@ -192,14 +213,14 @@ namespace Traders
             string str = myid + ":\t";
             foreach (double d in desireProfile)
             {
-                str += Math.Round(d * 100) + "\t";
+                str += Math.Round(d * 1000) + "\t";
             }
             return str;
         }
 
         public string PrintPortfolioI(int i)
         {
-            return portfolio[i].type + " (" + Math.Round(DesireFor(portfolio[i]) * 100) + ")";
+            return portfolio[i].type + "(" + Math.Round(DesireFor(portfolio[i]) * 1000) + ")";
         }
     }
 }

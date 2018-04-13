@@ -1,16 +1,50 @@
-﻿>Market
+﻿How can gini be -ve?
+
+
+
+>RESULTS
+Obviously capitalism leads to inequality since capitalists get a % of the non-capitalists. If its in a hierarchy even more so.
+The commodity round robin is very optimal. The most optimal is actually a complex problem. Developing trading strategies is a side issue.
+
+
+>Model Doc
+>Market
 List of commodities
 List of traders
 
 >Commodities
 have a type
+Magic type for people (traders)
 
 >Traders
 have a desire for each commodity
 
+>Desire is either lookup for basic coms
+ or 50% of satifaction of trader
+
+>Satisfaction (ie success in getting what you desire) is the currency.
+Satisfaction is sum of desire for portfolio.
+Capitalists get a share of satisfaction of traders they own (what does this mean? At moment they benefit from their subordinate desires?)
+
+
+Note: 1 good thing is is Trader encapsulates all Trader stuff like desire for traders!
+? should commodity do desireFor tho rather than Trader? Or where else should it be?
+>old problem of where does the glue between objects go?
 
 =TODO
 
-The whole idea is to get traders adding traders to portfolio
+>Change trading so Portfolios can be different sizes. Then add Capitalists w/o removing commodities
+>Then can create a hierarchy of capitalists and see the flow of satisfaction.
 
-Now we need to get a desire for Trader objects
+>Introduce currency somehow so can get pricing to really watch a free market model.
+>Currently capitalists get 50% of the satisfaction. More realistic would be have a flow commodities from producers to consumers.
+
+
+>desire profile must be more complex for traders as much take some its value!
+So desire profile must be based upon the state of the target
+->move desire profile into the commodity?
+so comm decides on contact?
+
+>Would create desire profile on contact. BUT makes very difficult to recreate as order of exposer will change and so pick off different rnd #.
+
+>

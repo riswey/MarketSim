@@ -14,7 +14,7 @@ namespace Traders
 {
     public delegate bool D_TradeMethod<T>(T t1, T t2);
 
-    partial class World
+    public partial class World
     {
         static public MyRandom rnd = new MyRandom();
 
@@ -22,11 +22,17 @@ namespace Traders
         int NUM_COM_TYPES;
         int PORTFOLIO_SIZE;
 
+        /// <summary>
+        /// Used for traversing the world commodities
+        /// </summary>
         public List<I_Commodity> commodities = new List<I_Commodity>();
+        /// <summary>
+        /// Used for traversing the world traders
+        /// </summary>
         public List<Trader> traders = new List<Trader>();
 
         //Give all traders same portfolio size in this model
-        public World(int n_traders, int n_com_types, int pf_size)
+        public World(int n_traders, int n_com_types, int pf_size, Dictionary<int,int> capitalists = null)
         {
             rnd.Reset();
 
@@ -35,10 +41,20 @@ namespace Traders
 
             for (int i = 0; i < n_traders; i++)
             {
-                List<I_Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
                 double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
+
+                List<I_Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
+
                 traders.Add(new Trader(portfolio, dp) );
                 commodities.AddRange(portfolio);
+            }
+
+            if (capitalists == null) return;
+
+            //Add Capitalism
+            foreach(KeyValuePair<int,int> status in capitalists)
+            {
+                traders[status.Key].Take(traders[status.Value]);
             }
 
         }
@@ -62,9 +78,15 @@ namespace Traders
 
         public bool Run<T>(int loops, Action<List<T>, D_TradeMethod<T>> MeetMethod, D_TradeMethod<T> TradeMethod)
         {
+            Console.WriteLine("\n--- WORLD RUN ---- " + TradeMethod.GetType().ToString() + "\n");
+
             int i = 0;
             while (i++ < loops) {
+
+                //Console.WriteLine(PrintSatisfaction());
                 Console.WriteLine(WorldSatisfaction());
+                Console.WriteLine("Gini: " + WorldGini());
+
 
                 if (typeof(T) == typeof(Trader))
                 {
@@ -79,7 +101,45 @@ namespace Traders
                     return false;
                 }
             }
+
             return true;
+        }
+
+        //////////////////////////////////////////
+        // METRICS ///////////////////////////////
+        //////////////////////////////////////////
+
+        /// <summary>
+        /// calculates Gini, TotalSatisfaction on the side 
+        /// </summary>
+        /// <param name="sum"></param>
+        /// <returns></returns>
+        public double WorldGini()
+        {
+            List<double> sat = new List<double>();
+            foreach (Trader t in traders)
+            {
+                sat.Add(t.Satisfaction());
+            }
+            return Gini(sat);
+        }
+
+        public static double Gini(List<double> values)
+        {
+            values.Sort();
+
+            double areaB = 0;
+            double sum = 0;
+            foreach (double s in values)
+            {
+                sum = sum + s;
+                areaB = areaB + sum;
+            }
+
+            double areaTri = sum * values.Count / 2.0;
+            double areaA = areaTri - areaB;
+
+            return areaA / areaTri;
         }
 
         public double WorldSatisfaction()
@@ -146,11 +206,12 @@ namespace Traders
             {
                 double s = t.Satisfaction();
                 sum += s;
-                str += Math.Round(s,2) + "\t";
+                str += Math.Round(s,3) + "\t";
             }
-            str += "\nTotal: " + Math.Round(sum, 2);
+            str += "\nTotal: " + Math.Round(sum, 3);
             return str;
         }
+
     }
 
 }
