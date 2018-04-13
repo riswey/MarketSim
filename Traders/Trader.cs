@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 namespace Traders
 {
 
-    public partial class Trader: I_Commodity
+    public partial class Trader: ICloneable, I_Commodity
     {
+        public static List<I_Commodity> commodities = new List<I_Commodity>();
+
+
         const int TRADER_TYPE = -1;
-
         static int ID = 0;
-        public string myid { get; } = "T" + ID++;
 
+        public string myid { get; } = "T" + ID++;
         double[] desireProfile;
 
         public List<I_Commodity> portfolio { get; } = new List<I_Commodity>();
@@ -32,7 +34,24 @@ namespace Traders
             }
         }
 
-        public static double[] RandomDesireProfile(MyRandom rnd, int n_com_types)
+        //Clone
+        private Trader(Trader t)
+        {
+            this.myid = t.myid;
+            this.type = TRADER_TYPE;
+            //value type: ok
+            this.desireProfile = new double[desireProfile.Length];
+            t.desireProfile.CopyTo(this.desireProfile, 0);
+
+            //copy positions in the
+            this.portfolio = t.portfolio;
+            this.owner = t.owner;
+
+
+
+        }
+
+        public static double[] RandomDesireProfile(Random rnd, int n_com_types)
         {
             var dp = new double[n_com_types];
             for (int i = 0; i < n_com_types; i++)
@@ -101,6 +120,11 @@ namespace Traders
             t2.Release(c2);
             t1.Take(c2);
             t2.Take(c1);
+        }
+
+        public object Clone()
+        {
+            return new Trader(this);
         }
 
 

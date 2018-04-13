@@ -13,7 +13,7 @@ namespace Traders
         Trader owner { get; set; }
     }
 
-    public class Commodity: I_Commodity
+    public class Commodity: ICloneable, I_Commodity
     {
         static int ID = 0;
         public string myid { get; } = "C" + ID++;
@@ -26,12 +26,20 @@ namespace Traders
             type = t;
         }
 
-        public static I_Commodity NewRandomCommodity(MyRandom rnd, int t)
+        //For Cloning
+        private Commodity(Commodity c)
+        {
+            this.myid = c.myid;
+            this.type = c.type;
+            this.owner = c.owner;       //TODO: copies reference... needs to be a new owners!
+        }
+
+        public static I_Commodity NewRandomCommodity(Random rnd, int t)
         {
             return new Commodity(rnd.Next(t));
         }
 
-        public static List<I_Commodity> ListRandomCommodities(MyRandom rnd, int size, int n_com_types)
+        public static List<I_Commodity> ListRandomCommodities(Random rnd, int size, int n_com_types)
         {
             List<I_Commodity> coms = new List<I_Commodity>();
             for (int i = 0; i < size; i++)
@@ -41,5 +49,9 @@ namespace Traders
             return coms;
         }
 
+        public object Clone()
+        {
+            return new Commodity(this);
+        }
     }
 }

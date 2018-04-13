@@ -16,9 +16,8 @@ namespace Traders
 
     public partial class World
     {
-        static public MyRandom rnd = new MyRandom();
 
-        //Who is in this world
+        //Who is in this world (remove this?)
         int NUM_COM_TYPES;
         int PORTFOLIO_SIZE;
 
@@ -31,23 +30,32 @@ namespace Traders
         /// </summary>
         public List<Trader> traders = new List<Trader>();
 
-        //Give all traders same portfolio size in this model
-        public World(int n_traders, int n_com_types, int pf_size, Dictionary<int,int> capitalists = null)
+        static void GenerateTraders(int n_traders, int n_com_types, int pf_size, out List<Trader> traders, out List<I_Commodity> commodities)
         {
-            rnd.Reset();
+            Random rnd = new Random();
 
-            NUM_COM_TYPES = n_com_types;
-            PORTFOLIO_SIZE = pf_size;
+            traders = new List<Trader>();
+            commodities = new List<I_Commodity>();
 
             for (int i = 0; i < n_traders; i++)
             {
                 double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
-
                 List<I_Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
-
-                traders.Add(new Trader(portfolio, dp) );
+                traders.Add(new Trader(portfolio, dp));
                 commodities.AddRange(portfolio);
             }
+
+        }
+
+
+        //Give all traders same portfolio size in this model
+        public World(List<Trader> traders, List<I_Commodity> commodities, int n_com_types, int pf_size, Dictionary<int,int> capitalists = null)
+        {
+            NUM_COM_TYPES = n_com_types;
+            PORTFOLIO_SIZE = pf_size;
+
+            this.traders = traders;
+            this.commodities = commodities;
 
             if (capitalists == null) return;
 
