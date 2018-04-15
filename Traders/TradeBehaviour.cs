@@ -13,8 +13,25 @@ namespace Traders
     /// </summary>
     class TraderBehaviour
     {
-        static public bool RandomExchange(Trader t1, Trader t2)
+        static bool TypeTrader(Entity a, Entity b, out Trader t1, out Trader t2)
         {
+            if(a.type == Trader.TRADER_TYPE && b.type == Trader.TRADER_TYPE)
+            {
+                t1 = (Trader)a;
+                t2 = (Trader)b;
+                return true;
+            }
+            t1 = null;
+            t2 = null;
+
+            return false;
+        }
+
+        static public bool RandomExchange(Entity e1, Entity e2)
+        {
+            Trader t1, t2;
+            if (!TypeTrader(e1,e2,out t1,out t2)) return false;
+
             int pos1 = Market.rnd.Next(t1.portfolio.Count);
             int pos2 = Market.rnd.Next(t2.portfolio.Count);
             Trader.Exchange(t1.index, t2.index, t1.portfolio[pos1], t2.portfolio[pos2]);
@@ -22,8 +39,10 @@ namespace Traders
         }
 
         //TODO: not finished
-        static public bool OptimalExchange(Trader t1, Trader t2)
+        static public bool OptimalExchange(Entity e1, Entity e2)
         {
+            Trader t1, t2;
+            if (!TypeTrader(e1, e2, out t1, out t2)) return false;
             //sort by desire profile of 
             List<double> desires11 = new List<double>();
             List<double> desires12 = new List<double>();
@@ -69,8 +88,11 @@ namespace Traders
 
         }
 
-        public static bool MutualMaxSwap(Trader t1, Trader t2)
+        public static bool MutualMaxSwap(Entity e1, Entity e2)
         {
+            Trader t1, t2;
+            if (!TypeTrader(e1, e2, out t1, out t2)) return false;
+
             double d1, d2, mag, arg, max = 0;
 
             Order o = null;
@@ -106,8 +128,10 @@ namespace Traders
 
         static public bool CommodityExchange(Entity c1, Entity c2)
         {
-            Trader t1 = Trader.Index2Entity<Trader>(c1.owner);
-            Trader t2 = Trader.Index2Entity<Trader>(c2.owner);
+            if (c1.type == Trader.TRADER_TYPE || c1.type == Trader.TRADER_TYPE) return false;
+
+            Trader t1 = Market.Index2Entity<Trader>(c1.owner);
+            Trader t2 = Market.Index2Entity<Trader>(c2.owner);
 
             double dpcc = t1.DesireFor(c1.index);
             double dpcd = t1.DesireFor(c2.index);

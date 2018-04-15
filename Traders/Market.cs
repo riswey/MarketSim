@@ -12,20 +12,27 @@ using System.Threading.Tasks;
 
 namespace Traders
 {
-    public delegate bool D_TradeMethod<T>(T t1, T t2);
+    public delegate bool D_TradeMethod(Entity t1, Entity t2);
 
     public partial class Market
     {
+        private static Dictionary<int, Entity> world;
+        public static void BindMarketToData(Dictionary<int, Entity> world)
+        {
+            Market.world = world;
+        }
+
+        static public T Index2Entity<T>(int index) where T : Entity
+        {
+            return world[index] as T;   //null if error
+        }
+
+
         public List<Entity> entities;
         //Traders is just to help with looping
         public List<Trader> traders;
 
         public static Random rnd = new Random();
-
-        static void BindMarketToData(Dictionary<int, Entity> world)
-        {
-            Entity.BindWorld(world);
-        }
 
         static public void GenerateWorld(out Dictionary<int, Entity> world, int n_traders, int n_com_types, int pf_size, int[] capitalists = null)
         {
@@ -100,24 +107,24 @@ namespace Traders
             }
         }
 
-        public static void MeetRoundRobin<T>(List<T> collection, D_TradeMethod<T> TradeMethod)
+        public static void MeetRoundRobin(D_TradeMethod TradeMethod)
         {
             //Every trader meets every trader
             //triangle or do in reverse also?
-            foreach (T a in collection)
+            foreach (KeyValuePair<int, Entity> a in world)
             {
-                foreach (T b in collection)
+                foreach (KeyValuePair<int, Entity> b in world)
                 {
-                    if (a.Equals(b)) continue;
+                    if (a.Value.Equals(b.Value)) continue;
 
                     //Ignoring bool return
-                    TradeMethod(a, b);
+                    TradeMethod(a.Value, b.Value);
 
                 }
             }
         }
 
-        public bool Run<T>(int loops, Action<List<T>, D_TradeMethod<T>> MeetMethod, D_TradeMethod<T> TradeMethod)
+        public bool Run(int loops, Action<D_TradeMethod> MeetMethod, D_TradeMethod TradeMethod)
         {
             Console.WriteLine("\n--- WORLD RUN ---- " + TradeMethod.GetType().ToString() + "\n");
 
@@ -128,19 +135,7 @@ namespace Traders
                 Console.WriteLine(WorldSatisfaction());
                 Console.WriteLine("Gini: " + WorldGini());
 
-
-                if (typeof(T) == typeof(Trader))
-                {
-                    MeetMethod(traders as List<T>, TradeMethod);
-                }
-                else if (typeof(T) == typeof(Entity))
-                {
-                    MeetMethod(entities as List<T>, TradeMethod);
-                }
-                else
-                {
-                    return false;
-                }
+                MeetMethod(TradeMethod);
             }
 
             return true;

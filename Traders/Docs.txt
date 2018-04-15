@@ -1,4 +1,6 @@
-﻿I_Worker
+﻿Now that Trader inherits from Entity can we do behaviours non generic?
+
+I_Worker
 skill, makes this type per n_cycles
 
 Capitalists actually take commodities -> richer makes people richer

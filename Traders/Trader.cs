@@ -56,7 +56,7 @@ namespace Traders
 
         public double DesireFor(int index)
         {
-            Entity c = Entity.Index2Entity<Entity>(index);
+            Entity c = Market.Index2Entity<Entity>(index);
 
             if (c.type != TRADER_TYPE)
             {
@@ -91,7 +91,7 @@ namespace Traders
         //Needs to be able public Take so can add commodities in setup
         public bool Take(int index)
         {
-            Entity c = Entity.Index2Entity<Entity>(index);
+            Entity c = Market.Index2Entity<Entity>(index);
 
             if (c.owner == FREE)
             {
@@ -107,16 +107,16 @@ namespace Traders
 
         bool Release(int index)
         {
-            Entity.Index2Entity<Entity>(index).owner = FREE;
+            Market.Index2Entity<Entity>(index).owner = FREE;
             return portfolio.Remove(index);
         }
 
         public static void Exchange(int t1, int t2, int c1, int c2)
         {
-            Entity.Index2Entity<Trader>(t1).Release(c1);
-            Entity.Index2Entity<Trader>(t2).Release(c2);
-            Entity.Index2Entity<Trader>(t1).Take(c2);
-            Entity.Index2Entity<Trader>(t2).Take(c1);
+            Market.Index2Entity<Trader>(t1).Release(c1);
+            Market.Index2Entity<Trader>(t2).Release(c2);
+            Market.Index2Entity<Trader>(t1).Take(c2);
+            Market.Index2Entity<Trader>(t2).Take(c1);
         }
 
         public object Clone()
@@ -254,7 +254,7 @@ namespace Traders
             if (index >= portfolio.Count) return "";
 
             int idx = portfolio[index];
-            Entity c = Entity.Index2Entity<Entity>(idx);
+            Entity c = Market.Index2Entity<Entity>(idx);
             return c.type + "(" + Math.Round(DesireFor(idx) * 1000) + ")";
         }
     }

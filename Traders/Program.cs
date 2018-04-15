@@ -13,7 +13,7 @@ namespace Traders
             const int N_TRADERS = 10;
             const int N_COM_TYPES = 5;
             const int SIZE_COM_PORTFOLIO = 10;
-            const int LOOPS = 20;
+            const int LOOPS = 5;
             //Owner/Worker dictionary
             //e.g. 9{6{0,1},7{2,3},8{4,5}}
             int[] capitalists = new int[] { 
@@ -41,7 +41,7 @@ namespace Traders
             Console.WriteLine(market1.PrintSatisfaction());
             Console.WriteLine("Gini: " + market1.WorldGini());
 
-            market1.Run<Trader>(LOOPS, Market.MeetRoundRobin, TraderBehaviour.MutualMaxSwap);
+            market1.Run(LOOPS, Market.MeetRoundRobin, TraderBehaviour.MutualMaxSwap);
 
             Console.WriteLine("");
 
