@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Traders
 {
+    /// <summary>
+    /// Only deals with indexes
+    /// </summary>
     public class Order
     {
         public static List<Order> collection = new List<Order>();
@@ -27,19 +30,15 @@ namespace Traders
             Order.collection.Clear();
         }
 
-        public Trader t1;
-        public Trader t2;
-        public I_Commodity c1;
-        public I_Commodity c2;
+        public int t1;
+        public int t2;
+        public int c1;
+        public int c2;
 
         public void Execute()
         {
-            Trader.Exchange(t1,t2,c1,c2);            
+            Trader.Exchange(t1, t2, c1, c2);            
         }
 
-        public string ToString()
-        {
-            return t1.DesireFor(c1) + "->" + t1.DesireFor(c2) + "," + t2.DesireFor(c2) + "->" + t2.DesireFor(c1);
-        }
     }
 }

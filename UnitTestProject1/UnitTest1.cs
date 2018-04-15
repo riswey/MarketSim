@@ -17,12 +17,12 @@ namespace Traders
         public void Initialize()
         {
         }
-
+        /*
         void Init(double[] dp1, double[] dp2) {
-            t1 = new Trader(new List<I_Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp1);
-            t2 = new Trader(new List<I_Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp2);
+            t1 = new Trader(new List<Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp1);
+            t2 = new Trader(new List<Commodity>() { new Commodity(0), new Commodity(1), new Commodity(2), new Commodity(3) }, dp2);
         }
-
+        */
         [TestCleanup()]
         public void Cleanup()
         {
@@ -57,7 +57,7 @@ namespace Traders
         [TestMethod]
         public void TraderTakeRelease()
         {
-            var c = new Commodity(3);
+            var c = new Entity(3);
             /*
             t1.Take( c );
             Assert.AreEqual(5,t1.portfolio.Count, "Count wrong after take");
@@ -78,10 +78,10 @@ namespace Traders
         {
 
             //t1 has 2x 
-            Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
+            //Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
 
-            I_Commodity c;
-            List<I_Commodity> offers;
+            Entity c;
+            List<Entity> offers;
             /*
             c = new Commodity(0);
             offers = t1.offerCommodity(c);
@@ -105,9 +105,9 @@ namespace Traders
         public void Consider()
         {
             //t1 has 2x 
-            Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
+            //Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, null);
 
-            List<I_Commodity> ls = new List<I_Commodity>() {new Commodity(0)};
+            List<Entity> ls = new List<Entity>() {new Entity(0)};
             /*
             I_Commodity swap = t1.considerOffers( ls );
             Assert.AreEqual(null, swap);
@@ -130,7 +130,7 @@ namespace Traders
             //Each have 1 of each
 
             //t1 has 2x 
-            Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, new double[] { 0.5, 0.4, 0.3, 0.2 });
+            //Init(new double[] { 0.2, 0.3, 0.4, 0.5 }, new double[] { 0.5, 0.4, 0.3, 0.2 });
 
             //1,2,3,4
             //1,2,3,4

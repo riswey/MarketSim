@@ -14,57 +14,90 @@ namespace Traders
 {
     public delegate bool D_TradeMethod<T>(T t1, T t2);
 
-    public partial class World
+    public partial class Market
     {
+        public List<Entity> entities;
+        //Traders is just to help with looping
+        public List<Trader> traders;
 
-        //Who is in this world (remove this?)
-        int NUM_COM_TYPES;
-        int PORTFOLIO_SIZE;
+        public static Random rnd = new Random();
 
-        /// <summary>
-        /// Used for traversing the world commodities
-        /// </summary>
-        public List<I_Commodity> commodities = new List<I_Commodity>();
-        /// <summary>
-        /// Used for traversing the world traders
-        /// </summary>
-        public List<Trader> traders = new List<Trader>();
-
-        static void GenerateTraders(int n_traders, int n_com_types, int pf_size, out List<Trader> traders, out List<I_Commodity> commodities)
+        static void BindMarketToData(Dictionary<int, Entity> world)
         {
-            Random rnd = new Random();
+            Entity.BindWorld(world);
+        }
 
-            traders = new List<Trader>();
-            commodities = new List<I_Commodity>();
+        static public void GenerateWorld(out Dictionary<int, Entity> world, int n_traders, int n_com_types, int pf_size, int[] capitalists = null)
+        {
+            world = new Dictionary<int, Entity >();
 
+            int n_commodities = n_traders * pf_size, type;
+
+            //Create commodities
+            Entity e;
+            for (int i = 0; i < n_commodities; i++)
+            {
+                type = rnd.Next(n_com_types);
+                e = new Entity(type);
+                world[e.index] = e;
+            }
+
+            Dictionary<int, int> tradermap = new Dictionary<int, int>();
+
+            //Traders need world bound to static reference
+            BindMarketToData(world);
+
+            //Create traders
             for (int i = 0; i < n_traders; i++)
             {
                 double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
-                List<I_Commodity> portfolio = Commodity.ListRandomCommodities(rnd, pf_size, n_com_types);
-                traders.Add(new Trader(portfolio, dp));
-                commodities.AddRange(portfolio);
+                int[] portfolio = Trader.RangePortfolio(i* pf_size, pf_size);
+                Trader t = new Trader(portfolio, dp);
+
+                tradermap[i] = t.index;
+
+                world[t.index] = t;
             }
-
-        }
-
-
-        //Give all traders same portfolio size in this model
-        public World(List<Trader> traders, List<I_Commodity> commodities, int n_com_types, int pf_size, Dictionary<int,int> capitalists = null)
-        {
-            NUM_COM_TYPES = n_com_types;
-            PORTFOLIO_SIZE = pf_size;
-
-            this.traders = traders;
-            this.commodities = commodities;
 
             if (capitalists == null) return;
 
             //Add Capitalism
-            foreach(KeyValuePair<int,int> status in capitalists)
+            for(int i=0;i<capitalists.Length;i+=2)
             {
-                traders[status.Key].Take(traders[status.Value]);
+                int owner = tradermap[capitalists[i]];
+                int worker = tradermap[capitalists[i + 1]];
+
+                ((Trader)world[owner]).Take(worker);
             }
 
+        }
+
+        public static List<Entity> ListRandomCommodities(Random rnd, int size, int n_com_types)
+        {
+            List<Entity> coms = new List<Entity>();
+            for (int i = 0; i < size; i++)
+            {
+                coms.Add(new Entity(rnd.Next(n_com_types)));
+            }
+            return coms;
+        }
+
+        public Market(Dictionary<int, Entity> world)
+        {
+            //Bind Market to this world
+            BindMarketToData(world);
+
+            //Create convenience lists of world
+            entities = new List<Entity>();
+            traders = new List<Trader>();
+            foreach(KeyValuePair<int, Entity> e in world)
+            {
+                entities.Add(e.Value);
+                if (e.Value.type == Trader.TRADER_TYPE)
+                {
+                    traders.Add((Trader) e.Value);
+                }
+            }
         }
 
         public static void MeetRoundRobin<T>(List<T> collection, D_TradeMethod<T> TradeMethod)
@@ -100,9 +133,9 @@ namespace Traders
                 {
                     MeetMethod(traders as List<T>, TradeMethod);
                 }
-                else if (typeof(T) == typeof(I_Commodity))
+                else if (typeof(T) == typeof(Entity))
                 {
-                    MeetMethod(commodities as List<T>, TradeMethod);
+                    MeetMethod(entities as List<T>, TradeMethod);
                 }
                 else
                 {
@@ -166,15 +199,13 @@ namespace Traders
     // TELEMETRY /////////////////////////////
     //////////////////////////////////////////
 
-    partial class World {
+    partial class Market {
         public string printDP()
         {
             string str = "▄ Desire Profile------------------------------------------------\n\t";
 
-            for (int i = 0; i < NUM_COM_TYPES; i++)
-            {
-                str += "Type" + i + "\t";
-            }
+            traders[0].PrintDesireProfile(true);
+
             foreach (Trader t in traders)
             {
                 str += "\n" + t.PrintDesireProfile();
@@ -185,12 +216,18 @@ namespace Traders
         public string printPortfolios()
         {
             string str = "▄ Portfolios-----------------------------------------------------------------\n";
+
+            int max_pf_size = 0;
             foreach (Trader t in traders)
             {
-                str += t.myid + "\t";
+                str += t.index + "\t";
+                if (t.portfolio.Count > max_pf_size)
+                {
+                    max_pf_size = t.portfolio.Count;
+                }
             }
 
-            for (int i = 0; i < PORTFOLIO_SIZE; i++)
+            for (int i = 0; i < max_pf_size; i++)
             {
                 str += "\n";
                 foreach (Trader t in traders)
@@ -207,7 +244,7 @@ namespace Traders
             double sum = 0;
             foreach (Trader t in traders)
             {
-                str += t.myid + "\t";
+                str += t.index + "\t";
             }
             str += "\n";
             foreach (Trader t in traders)

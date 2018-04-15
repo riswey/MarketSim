@@ -7,48 +7,31 @@ using System.Threading.Tasks;
 namespace Traders
 {
 
-    public partial class Trader: ICloneable, I_Commodity
+    public partial class Trader: Entity, ICloneable
     {
-        public static List<I_Commodity> commodities = new List<I_Commodity>();
+        public const int TRADER_TYPE = -1;
 
-
-        const int TRADER_TYPE = -1;
-        static int ID = 0;
-
-        public string myid { get; } = "T" + ID++;
         double[] desireProfile;
+        public List<int> portfolio { get; } = new List<int>();
 
-        public List<I_Commodity> portfolio { get; } = new List<I_Commodity>();
-
-        // I_Commodity
-        public int type { get; set; } = TRADER_TYPE; 
-        public Trader owner { get; set; } = null;   //free
-        //
-
-        public Trader(List<I_Commodity> portfolio, double[] dp)
+        public Trader(int[] portfolio, double[] dp): base(TRADER_TYPE)
         {
-            desireProfile = dp;
-            foreach(I_Commodity c in portfolio)
+            this.desireProfile = dp;
+            foreach(int c in portfolio)
             {
                 Take(c);
             }
         }
 
         //Clone
-        private Trader(Trader t)
+        private Trader(Trader t): base(t)
         {
-            this.myid = t.myid;
-            this.type = TRADER_TYPE;
-            //value type: ok
-            this.desireProfile = new double[desireProfile.Length];
+            this.desireProfile = new double[t.desireProfile.Length];
             t.desireProfile.CopyTo(this.desireProfile, 0);
 
-            //copy positions in the
-            this.portfolio = t.portfolio;
-            this.owner = t.owner;
-
-
-
+            int[] arr_pf = new int[t.portfolio.Count];
+            t.portfolio.CopyTo(arr_pf);
+            this.portfolio = arr_pf.ToList();
         }
 
         public static double[] RandomDesireProfile(Random rnd, int n_com_types)
@@ -61,8 +44,20 @@ namespace Traders
             return dp;
         }
 
-        public double DesireFor(I_Commodity c)
+        public static int[] RangePortfolio(int start, int length)
         {
+            int[] pf = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                pf[i] = start + i;
+            }
+            return pf;
+        }
+
+        public double DesireFor(int index)
+        {
+            Entity c = Entity.Index2Entity<Entity>(index);
+
             if (c.type != TRADER_TYPE)
             {
                 return desireProfile[c.type];
@@ -78,7 +73,7 @@ namespace Traders
         public double Satisfaction()
         {
             double sum = 0.0;
-            foreach(I_Commodity c in portfolio)
+            foreach(int c in portfolio)
             {
                 sum += DesireFor(c);
             }
@@ -94,12 +89,14 @@ namespace Traders
         }
 
         //Needs to be able public Take so can add commodities in setup
-        public bool Take(I_Commodity c)
+        public bool Take(int index)
         {
-            if (c.owner == null)
+            Entity c = Entity.Index2Entity<Entity>(index);
+
+            if (c.owner == FREE)
             {
-                c.owner = this;
-                portfolio.Add(c);
+                c.owner = base.index;
+                portfolio.Add(index);
             }
             else
             {
@@ -108,18 +105,18 @@ namespace Traders
             return true;
         }
 
-        bool Release(I_Commodity c)
+        bool Release(int index)
         {
-            c.owner = null;
-            return portfolio.Remove(c);
+            Entity.Index2Entity<Entity>(index).owner = FREE;
+            return portfolio.Remove(index);
         }
 
-        public static void Exchange(Trader t1, Trader t2, I_Commodity c1, I_Commodity c2)
+        public static void Exchange(int t1, int t2, int c1, int c2)
         {
-            t1.Release(c1);
-            t2.Release(c2);
-            t1.Take(c2);
-            t2.Take(c1);
+            Entity.Index2Entity<Trader>(t1).Release(c1);
+            Entity.Index2Entity<Trader>(t2).Release(c2);
+            Entity.Index2Entity<Trader>(t1).Take(c2);
+            Entity.Index2Entity<Trader>(t2).Take(c1);
         }
 
         public object Clone()
@@ -232,9 +229,19 @@ namespace Traders
 
     partial class Trader
     {
-        public string PrintDesireProfile()
+        public string PrintDesireProfile(bool header = false)
         {
-            string str = myid + ":\t";
+            string str = "";
+            if (header)
+            {
+                for (int i = 0; i < desireProfile.Length; i++)
+                {
+                    str += "Type" + i + "\t";
+                }
+                return str;
+            }
+
+            str = index + ":\t";
             foreach (double d in desireProfile)
             {
                 str += Math.Round(d * 1000) + "\t";
@@ -242,9 +249,13 @@ namespace Traders
             return str;
         }
 
-        public string PrintPortfolioI(int i)
+        public string PrintPortfolioI(int index)
         {
-            return portfolio[i].type + "(" + Math.Round(DesireFor(portfolio[i]) * 1000) + ")";
+            if (index >= portfolio.Count) return "";
+
+            int idx = portfolio[index];
+            Entity c = Entity.Index2Entity<Entity>(idx);
+            return c.type + "(" + Math.Round(DesireFor(idx) * 1000) + ")";
         }
     }
 }

@@ -13,12 +13,11 @@ namespace Traders
     /// </summary>
     class TraderBehaviour
     {
-
         static public bool RandomExchange(Trader t1, Trader t2)
         {
-            int pos1 = World.rnd.Next(t1.portfolio.Count);
-            int pos2 = World.rnd.Next(t2.portfolio.Count);
-            Trader.Exchange(t1, t2, t1.portfolio[pos1], t2.portfolio[pos2]);
+            int pos1 = Market.rnd.Next(t1.portfolio.Count);
+            int pos2 = Market.rnd.Next(t2.portfolio.Count);
+            Trader.Exchange(t1.index, t2.index, t1.portfolio[pos1], t2.portfolio[pos2]);
             return true;
         }
 
@@ -32,12 +31,12 @@ namespace Traders
             List<double> desires22 = new List<double>();
 
             //get a list of desires
-            foreach(I_Commodity c in t1.portfolio)
+            foreach(int c in t1.portfolio)
             {
                 desires11.Add(t1.DesireFor(c));
                 desires21.Add(t2.DesireFor(c));
             }
-            foreach (I_Commodity c in t2.portfolio)
+            foreach (int c in t2.portfolio)
             {
                 desires12.Add(t1.DesireFor(c));
                 desires22.Add(t2.DesireFor(c));
@@ -76,9 +75,9 @@ namespace Traders
 
             Order o = null;
 
-            foreach (I_Commodity c1 in t1.portfolio)
+            foreach (int c1 in t1.portfolio)
             {
-                foreach (I_Commodity c2 in t2.portfolio)
+                foreach (int c2 in t2.portfolio)
                 {
                     d1 = t1.DesireFor(c2) - t1.DesireFor(c1);
                     d2 = t2.DesireFor(c1) - t2.DesireFor(c2);
@@ -90,7 +89,7 @@ namespace Traders
                     if (mag > max)
                     {
                         max = mag;
-                        o = new Order() { t1 = t1, t2 = t2, c1 = c1, c2 = c2 };
+                        o = new Order() { t1 = t1.index, t2 = t2.index, c1 = c1, c2 = c2 };
                     }
                 }
             }
@@ -105,20 +104,20 @@ namespace Traders
 
         }
 
-        static public bool CommodityExchange(I_Commodity c1, I_Commodity c2)
+        static public bool CommodityExchange(Entity c1, Entity c2)
         {
-            Trader t1 = c1.owner;
-            Trader t2 = c2.owner;
+            Trader t1 = Trader.Index2Entity<Trader>(c1.owner);
+            Trader t2 = Trader.Index2Entity<Trader>(c2.owner);
 
-            double dpcc = t1.DesireFor(c1);
-            double dpcd = t1.DesireFor(c2);
-            double dpdc = t2.DesireFor(c1);
-            double dpdd = t2.DesireFor(c2);
+            double dpcc = t1.DesireFor(c1.index);
+            double dpcd = t1.DesireFor(c2.index);
+            double dpdc = t2.DesireFor(c1.index);
+            double dpdd = t2.DesireFor(c2.index);
 
             if (dpcd > dpcc && dpdc > dpdd)
             {
                 //They agreed
-                Trader.Exchange(t1, t2, c1, c2);
+                Trader.Exchange(c1.owner, c2.owner, c1.index, c2.index);
             }
             return true;
         }

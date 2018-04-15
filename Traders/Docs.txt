@@ -1,5 +1,35 @@
-﻿How can gini be -ve?
+﻿I_Worker
+skill, makes this type per n_cycles
 
+Capitalists actually take commodities -> richer makes people richer
+
+
+>Switched collections to index for cloning.
+	otherwise would need to create new entities when copying
+	possible if Trader.Clone() {new Entity when copying deep portfolio}, set ower to this}
+	but anything not in a portfolio (not referenced) would not be recreated
+
+	This is possible actuially. Branch the previuous version
+
+
+All Entities are in one collection.
+Indexing uncouples models from underlying entities. Referencing means that model is tight coupled to actual entiuty, not just position. Enables shhallow cloning.
+All interfaces now uses int index to that world
+Creating the World Running the Model 
+
+Testing:
+
+>test world are created
+>test that world clones ok
+>test that clones can be changed independently and share no refs
+
+>test that entities are indexed ok
+
+
+There is a possibility that (world index) is confused with old trader/commodity index.
+Only places where this happens legitimately is:
+>capitalists dictionary
+>looping traders in Trader.
 
 
 >RESULTS
