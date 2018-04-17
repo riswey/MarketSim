@@ -16,25 +16,13 @@ namespace Traders
 
     public partial class Market
     {
-        private static Dictionary<int, Entity> world;
-        public static void BindMarketToData(Dictionary<int, Entity> world)
-        {
-            Market.world = world;
-        }
-
-        static public T Index2Entity<T>(int index) where T : Entity
-        {
-            return world[index] as T;   //null if error
-        }
-
-
         public List<Entity> entities;
         //Traders is just to help with looping
         public List<Trader> traders;
 
         public static Random rnd = new Random();
 
-        static public void GenerateWorld(out Dictionary<int, Entity> world, int n_traders, int n_com_types, int pf_size, int[] capitalists = null)
+        static public void WorldGenerator(out Dictionary<int, Entity> world, int n_traders, int n_com_types, int pf_size)
         {
             world = new Dictionary<int, Entity >();
 
@@ -49,10 +37,8 @@ namespace Traders
                 world[e.index] = e;
             }
 
-            Dictionary<int, int> tradermap = new Dictionary<int, int>();
-
             //Traders need world bound to static reference
-            BindMarketToData(world);
+            Bank.SetBankWorld(world);
 
             //Create traders
             for (int i = 0; i < n_traders; i++)
@@ -60,21 +46,32 @@ namespace Traders
                 double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
                 int[] portfolio = Trader.RangePortfolio(i* pf_size, pf_size);
                 Trader t = new Trader(portfolio, dp);
-
-                tradermap[i] = t.index;
-
                 world[t.index] = t;
             }
+        }
 
-            if (capitalists == null) return;
-
+        static public void AddCapitalists(Dictionary<int, Entity> world, int[] capitalists)
+        {
             //Add Capitalism
-            for(int i=0;i<capitalists.Length;i+=2)
+            //Capitalists are numbered 0.. in the definition. So need to map to entity index
+            Dictionary<int, int> tradermap = new Dictionary<int, int>();
+
+            int c = 0;
+            foreach (KeyValuePair<int, Entity> e in Bank.world)
+            {
+                if (e.Value.type == Trader.TRADER_TYPE)
+                {
+                    //Capitalist  0<=i<=n has entity index
+                    tradermap[c++] = e.Key;
+                }
+            }
+
+            for (int i = 0; i < capitalists.Length; i += 2)
             {
                 int owner = tradermap[capitalists[i]];
                 int worker = tradermap[capitalists[i + 1]];
 
-                ((Trader)world[owner]).Take(worker);
+                world[owner].Cast<Trader>().Take(worker);
             }
 
         }
@@ -91,9 +88,6 @@ namespace Traders
 
         public Market(Dictionary<int, Entity> world)
         {
-            //Bind Market to this world
-            BindMarketToData(world);
-
             //Create convenience lists of world
             entities = new List<Entity>();
             traders = new List<Trader>();
@@ -111,9 +105,9 @@ namespace Traders
         {
             //Every trader meets every trader
             //triangle or do in reverse also?
-            foreach (KeyValuePair<int, Entity> a in world)
+            foreach (KeyValuePair<int, Entity> a in Bank.world)
             {
-                foreach (KeyValuePair<int, Entity> b in world)
+                foreach (KeyValuePair<int, Entity> b in Bank.world)
                 {
                     if (a.Value.Equals(b.Value)) continue;
 
@@ -199,7 +193,7 @@ namespace Traders
         {
             string str = "▄ Desire Profile------------------------------------------------\n\t";
 
-            traders[0].PrintDesireProfile(true);
+            str += traders[0].PrintDesireProfile(true);
 
             foreach (Trader t in traders)
             {
@@ -207,6 +201,18 @@ namespace Traders
             }
             return str;
         }
+
+        public string printOwners()
+        {
+            string str = "▄ Owners------------------------------------------------\n";
+
+            foreach (Trader t in traders)
+            {
+                str += t.index + "(" + t.owner.ToString() + ")\t";
+            }
+            return str;
+        }
+
 
         public string printPortfolios()
         {

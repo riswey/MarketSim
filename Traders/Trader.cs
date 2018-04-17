@@ -24,7 +24,7 @@ namespace Traders
         }
 
         //Clone
-        private Trader(Trader t): base(t)
+        protected Trader(Trader t): base(t)
         {
             this.desireProfile = new double[t.desireProfile.Length];
             t.desireProfile.CopyTo(this.desireProfile, 0);
@@ -56,8 +56,8 @@ namespace Traders
 
         public double DesireFor(int index)
         {
-            Entity c = Market.Index2Entity<Entity>(index);
-
+            Entity c = Bank.Index2Entity<Entity>(index);
+            
             if (c.type != TRADER_TYPE)
             {
                 return desireProfile[c.type];
@@ -66,7 +66,7 @@ namespace Traders
             {
                 //TODO: BEWARE: Trader -> Trader can form a loop
                 //Half the satisfaction has been set aside for me already so this is mine 
-                return ((Trader)c).Satisfaction();
+                return c.Cast<Trader>().Satisfaction();
             }
         }
 
@@ -79,50 +79,74 @@ namespace Traders
             }
 
             //If has a capitalist then half will go to them so return only half
-            if (owner != null)
+            if (owner == Trader.FREE)
             {
-                return sum / 2;
+                return sum;
             } else {
                 //Free
-                return sum;
+                return sum / 2;
             }
         }
 
         //Needs to be able public Take so can add commodities in setup
-        public bool Take(int index)
+
+        //TODO have take auto release the owner
+        public bool Take(int idx)
         {
-            Entity c = Market.Index2Entity<Entity>(index);
+            Entity c = Bank.Index2Entity<Entity>(idx);
 
             if (c.owner == FREE)
             {
-                c.owner = base.index;
-                portfolio.Add(index);
+                c.owner = this.index;
+
+                portfolio.Add(idx);
             }
             else
             {
                 return false;
             }
+
             return true;
         }
 
         bool Release(int index)
         {
-            Market.Index2Entity<Entity>(index).owner = FREE;
+            Bank.Index2Entity<Entity>(index).owner = FREE;
             return portfolio.Remove(index);
         }
 
         public static void Exchange(int t1, int t2, int c1, int c2)
         {
-            Market.Index2Entity<Trader>(t1).Release(c1);
-            Market.Index2Entity<Trader>(t2).Release(c2);
-            Market.Index2Entity<Trader>(t1).Take(c2);
-            Market.Index2Entity<Trader>(t2).Take(c1);
+            Bank.Index2Entity<Trader>(t1).Release(c1);
+            Bank.Index2Entity<Trader>(t2).Release(c2);
+            Bank.Index2Entity<Trader>(t1).Take(c2);
+            Bank.Index2Entity<Trader>(t2).Take(c1);
         }
 
         public object Clone()
         {
             return new Trader(this);
         }
+
+        public static bool IsTrader(Entity e)
+        {
+            return e.type == Trader.TRADER_TYPE;
+        }
+
+        public static bool IsType(Entity a, Entity b, out Trader t1, out Trader t2)
+        {
+            if (IsTrader(a) && IsTrader(b))
+            {
+                t1 = (Trader)a;
+                t2 = (Trader)b;
+                return true;
+            }
+            t1 = null;
+            t2 = null;
+
+            return false;
+        }
+
 
 
         /*
@@ -254,7 +278,7 @@ namespace Traders
             if (index >= portfolio.Count) return "";
 
             int idx = portfolio[index];
-            Entity c = Market.Index2Entity<Entity>(idx);
+            Entity c = Bank.Index2Entity<Entity>(idx);
             return c.type + "(" + Math.Round(DesireFor(idx) * 1000) + ")";
         }
     }

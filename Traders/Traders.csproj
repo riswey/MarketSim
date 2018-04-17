@@ -48,8 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bank.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Worker.cs" />
     <Compile Include="MyRandom.cs" />
     <Compile Include="TradeBehaviour.cs" />
     <Compile Include="Order.cs" />

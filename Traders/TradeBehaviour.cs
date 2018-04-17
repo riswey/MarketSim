@@ -13,24 +13,10 @@ namespace Traders
     /// </summary>
     class TraderBehaviour
     {
-        static bool TypeTrader(Entity a, Entity b, out Trader t1, out Trader t2)
-        {
-            if(a.type == Trader.TRADER_TYPE && b.type == Trader.TRADER_TYPE)
-            {
-                t1 = (Trader)a;
-                t2 = (Trader)b;
-                return true;
-            }
-            t1 = null;
-            t2 = null;
-
-            return false;
-        }
-
         static public bool RandomExchange(Entity e1, Entity e2)
         {
             Trader t1, t2;
-            if (!TypeTrader(e1,e2,out t1,out t2)) return false;
+            if (!Trader.IsType(e1,e2,out t1,out t2)) return false;
 
             int pos1 = Market.rnd.Next(t1.portfolio.Count);
             int pos2 = Market.rnd.Next(t2.portfolio.Count);
@@ -42,7 +28,7 @@ namespace Traders
         static public bool OptimalExchange(Entity e1, Entity e2)
         {
             Trader t1, t2;
-            if (!TypeTrader(e1, e2, out t1, out t2)) return false;
+            if (!Trader.IsType(e1, e2, out t1, out t2)) return false;
             //sort by desire profile of 
             List<double> desires11 = new List<double>();
             List<double> desires12 = new List<double>();
@@ -91,7 +77,7 @@ namespace Traders
         public static bool MutualMaxSwap(Entity e1, Entity e2)
         {
             Trader t1, t2;
-            if (!TypeTrader(e1, e2, out t1, out t2)) return false;
+            if (!Trader.IsType(e1, e2, out t1, out t2)) return false;
 
             double d1, d2, mag, arg, max = 0;
 
@@ -130,8 +116,8 @@ namespace Traders
         {
             if (c1.type == Trader.TRADER_TYPE || c1.type == Trader.TRADER_TYPE) return false;
 
-            Trader t1 = Market.Index2Entity<Trader>(c1.owner);
-            Trader t2 = Market.Index2Entity<Trader>(c2.owner);
+            Trader t1 = Bank.Index2Entity<Trader>(c1.owner);
+            Trader t2 = Bank.Index2Entity<Trader>(c2.owner);
 
             double dpcc = t1.DesireFor(c1.index);
             double dpcd = t1.DesireFor(c2.index);

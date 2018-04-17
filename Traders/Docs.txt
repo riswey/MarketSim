@@ -1,7 +1,14 @@
-﻿Now that Trader inherits from Entity can we do behaviours non generic?
+﻿===> Have A Bank
+All entities, contracts, held in the bank
+Each trader accesses his account in the bank, pays in, takes out
+- Idea emerges from the accuming static functions at top of Market for handling the "world". Really this is bank wrapper.
+
+
 
 I_Worker
 skill, makes this type per n_cycles
+
+
 
 Capitalists actually take commodities -> richer makes people richer
 
@@ -11,8 +18,9 @@ Capitalists actually take commodities -> richer makes people richer
 	possible if Trader.Clone() {new Entity when copying deep portfolio}, set ower to this}
 	but anything not in a portfolio (not referenced) would not be recreated
 
-	This is possible actuially. Branch the previuous version
+	This is possible actuially. Branch the previuous version.
 
+	
 
 All Entities are in one collection.
 Indexing uncouples models from underlying entities. Referencing means that model is tight coupled to actual entiuty, not just position. Enables shhallow cloning.

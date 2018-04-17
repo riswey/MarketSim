@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Traders
 {
-    
-    public class Entity: ICloneable
+
+    public class Entity : ICloneable
     {
-        protected const int FREE = -1;
+        public const int FREE = -1;
 
         static int ID = 0;
         public int index { get; } = ID++;
@@ -34,5 +34,10 @@ namespace Traders
         {
             return new Entity(this);
         }
+
+        public T Cast<T>() where T: Entity {
+            return (T) this; 
+        }
+
     }
 }

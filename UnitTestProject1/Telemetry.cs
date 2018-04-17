@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace UnitTestProject1
 {
     [TestClass]
-    public class UnitTest3
+    public class Telemetry
     {
         [TestMethod]
         public void Gini()
