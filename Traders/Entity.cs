@@ -17,9 +17,10 @@ namespace Traders
         public int type { get; set; }
         public int owner { get; set; } = FREE;
 
-        public Entity(int t)
+        public Entity(int type, int owner)
         {
-            type = t;
+            this.type = type;
+            this.owner = owner;
         }
 
         //For Cloning

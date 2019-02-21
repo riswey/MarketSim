@@ -1,7 +1,18 @@
-﻿===> Have A Bank
+﻿Branch this and see if can go back to refernces.
+Copies done by cloning world and using index in new world (think if poss)
+You have Entities referencing other entities as owner. What if don't exist yet?
+Problem... you set capitalists afterwards. How to Clone that structure in refs?
+
+
+
+
+
+===> Have A Bank
 All entities, contracts, held in the bank
 Each trader accesses his account in the bank, pays in, takes out
 - Idea emerges from the accuming static functions at top of Market for handling the "world". Really this is bank wrapper.
+
+
 
 
 
