@@ -20,18 +20,15 @@ namespace Traders
         public Form1()
         {
             InitializeComponent();
-            Run();
         }
 
-        public void Run()
+        private void button1_Click(object sender, EventArgs e)
         {
-            const int N_TRADERS = 20;
-            const int N_TYPES = 10;
-            const int SIZE_PORTFOLIO = 20;
-            const int NTRADES = 3;
-            const int REPS = 10;             //montcarly reps
-
-
+            int N_TRADERS = (int)nudNumTraders.Value;
+            int N_TYPES = (int) nudNumTypes.Value;
+            int SIZE_PORTFOLIO = (int) nudPortfolioSize.Value;
+            int NTRADES = (int) nudNumPasses.Value;             //number of passes of exchange algorithm
+            int REPS = (int) nudReps.Value;                     //montcarly reps
 
             //Make the world & clone for each run replicate
             Enumerable
@@ -39,8 +36,9 @@ namespace Traders
                 .ForEachWithIndex((v, i) => rawdata.Add(World.WorldGenerator(N_TRADERS, N_TYPES, SIZE_PORTFOLIO)) );
 
             DoSim<Entity>(REPS, NTRADES, "Barter", TraderBehaviour.SimpleCompareEntities);
+            DoSim<Entity>(REPS, NTRADES, "Relative Barter", TraderBehaviour.RelativeCompareEntities);
             DoSim<Entity>(REPS, NTRADES, "Sacrifice", TraderBehaviour.Sacrifice);
-            DoSim<Entity>(REPS, NTRADES, "RelativeSacrifice", TraderBehaviour.Sacrifice);
+            DoSim<Entity>(REPS, NTRADES, "Relative Sacrifice", TraderBehaviour.RelativeSacrifice);
             DoSim<Entity>(REPS, NTRADES, "Giving Poor", TraderBehaviour.GivingPoor);
 
             DoSim<Trader>(REPS, NTRADES, "Max Exchange", TraderBehaviour.MutualMaxSwap);
@@ -55,11 +53,11 @@ namespace Traders
 
             Extensions.Loop(reps, (rep) =>
             {
-                WriteLine("\n> " + rep + "\n");
+                WriteLine("\nRun " + rep + ">\n");
                 //reset
                 world.LoadData(rawdata[rep]);
 
-                WriteLine("0\t" + Report.Stats(world.traders));
+                WriteLine("Pass 0:\t" + Report.Stats(world.traders));
 
                 if (typeof(T) == typeof(Trader))
                 {
@@ -70,7 +68,7 @@ namespace Traders
                             InteractionFunction(pair as Tuple<T, T>);
                         });
 
-                        WriteLine((i + 1) + "\t" + Report.Stats(world.traders));
+                        WriteLine("Pass " + (i + 1) + ":\t" + Report.Stats(world.traders));
                     });
 
                 }

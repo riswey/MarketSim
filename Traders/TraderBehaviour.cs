@@ -33,6 +33,30 @@ namespace Traders
 
         }
 
+        public static void RelativeCompareEntities(Tuple<Entity, Entity> pair)
+        {
+            Trader t1 = (Trader)pair.Item1.owner;
+            Trader t2 = (Trader)pair.Item2.owner;
+
+            double s1 = t1.Satisfaction();
+            double s2 = t2.Satisfaction();
+
+            if (!t1.Equals(t2))
+            {
+                double d11 = t1.DesireFor(pair.Item1) / s1;
+                double d12 = t1.DesireFor(pair.Item2) / s1;
+                double d21 = t2.DesireFor(pair.Item1) / s2;
+                double d22 = t2.DesireFor(pair.Item2) / s2;
+
+                //if t1 desires e2 more than its own
+                //if t2 desires e1 more than its own
+                if (d12 > d11 && d21 > d22) Trader.Exchange(t1, t2, pair.Item1, pair.Item2);
+
+            }
+
+        }
+
+
         public static void Sacrifice(Tuple<Entity, Entity> pair)
         {            
             Trader t1 = (Trader)pair.Item1.owner;
@@ -62,6 +86,37 @@ namespace Traders
 
         }
 
+        public static void RelativeSacrifice(Tuple<Entity, Entity> pair)
+        {
+            Trader t1 = (Trader)pair.Item1.owner;
+            Trader t2 = (Trader)pair.Item2.owner;
+
+            double s1 = t1.Satisfaction();
+            double s2 = t2.Satisfaction();
+
+            if (!t1.Equals(t2))
+            {
+                double d11 = t1.DesireFor(pair.Item1) / s1;
+                double d12 = t1.DesireFor(pair.Item2) / s1;
+                double d21 = t2.DesireFor(pair.Item1) / s2;
+                double d22 = t2.DesireFor(pair.Item2) / s2;
+
+                //If t2 needs item 1 more than t1 then give to t2
+                if (d21 > d11)
+                {
+                    t1.Release(pair.Item1);
+                    t2.Take(pair.Item1);
+                }
+
+                if (d12 > d22)
+                {
+                    t2.Release(pair.Item2);
+                    t1.Take(pair.Item2);
+                }
+
+            }
+
+        }
 
         public static void GivingPoor(Tuple<Entity, Entity> pair)
         {

@@ -10,13 +10,15 @@ namespace Traders
     {
         //Stats
 
-        public static string Stats(List<Trader> traders) { 
-            return string.Format("Gini: {0:0.000}\tMin: {1:0.000}\tMedian: {2:0.000}\tMax: {3:0.000}\tTotal: {4:0.000}",
+        public static string Stats(List<Trader> traders) {
+            double total = Report.WorldSatisfaction(traders);
+            return string.Format("Gini: {0:0.000}\tMin: {1:0.000}\tMedian: {2:0.000}\tMax: {3:0.000}\tTotal: {4:0.000}\tAvg: {5:0.000}",
                 Report.WorldGini(traders),
                 Report.MinSatisfaction(traders),
                 Report.MedianSatisfaction(traders),
                 Report.MaxSatisfaction(traders),
-                Report.WorldSatisfaction(traders)
+                total,
+                total / traders.Count
             );
         }
 
