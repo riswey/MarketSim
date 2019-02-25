@@ -13,7 +13,6 @@ namespace Traders
     /// </summary>
     public class TraderBehaviour
     {
-
         public static void SimpleCompareEntities(Tuple<Entity, Entity> pair)
         {
             Trader t1 = (Trader)pair.Item1.owner;

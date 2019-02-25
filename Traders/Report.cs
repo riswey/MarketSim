@@ -59,6 +59,31 @@ namespace Traders
             return traders.Sum(t => t.Satisfaction());
         }
 
+        public static List<double> WorldSatisfactionData(List<Trader> traders)
+        {
+            return traders.Select(t => t.Satisfaction()).ToList();
+        }
+
+        public static void SortBuckets(List<double> source, int totalBuckets, out List<int> bucketlist, out List<double> xaxis)
+        {
+            double min = source.Min();
+            double max = source.Max();
+            int[] buckets = new int[totalBuckets];
+
+            double bucketSize = (max - min) / totalBuckets;
+
+            source.ForEach(value =>
+            {
+                int bin = (int)Math.Floor((value - min)/ bucketSize);          //0 based index
+                if (bin == totalBuckets) bin = totalBuckets - 1;        //upper boundary case
+                buckets[bin]++;
+            });
+
+            bucketlist = buckets.ToList();
+            xaxis = Enumerable.Range(0, totalBuckets + 1).Select(value => (double)value * bucketSize + min).ToList();
+        }
+
+
         //Reports
 
         public static string printDP(List<Trader> traders)

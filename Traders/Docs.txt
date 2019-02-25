@@ -1,95 +1,17 @@
-﻿Branch this and see if can go back to refernces.
-Copies done by cloning world and using index in new world (think if poss)
-You have Entities referencing other entities as owner. What if don't exist yet?
-Problem... you set capitalists afterwards. How to Clone that structure in refs?
+﻿TODO:
+Introduce money to capture the disparity in trades. So nothing wasted.
+-> firstly just a group pool
+-> can we develop into money system like other branch?
+
+Taxation. i.e. let rich get rich but redistribute wealth. Sacrifice gives best total, but worst equality. So Tax and redistr?
 
 
+Capitalism where Traders can own traders who give 50% of satisfaction to them
 
 
-
-===> Have A Bank
-All entities, contracts, held in the bank
-Each trader accesses his account in the bank, pays in, takes out
-- Idea emerges from the accuming static functions at top of Market for handling the "world". Really this is bank wrapper.
-
-
-
-
-
+Flow of commodities from producers -> consumers for more real
 I_Worker
 skill, makes this type per n_cycles
-
-
-
-Capitalists actually take commodities -> richer makes people richer
-
-
->Switched collections to index for cloning.
-	otherwise would need to create new entities when copying
-	possible if Trader.Clone() {new Entity when copying deep portfolio}, set ower to this}
-	but anything not in a portfolio (not referenced) would not be recreated
-
-	This is possible actuially. Branch the previuous version.
-
-	
-
-All Entities are in one collection.
-Indexing uncouples models from underlying entities. Referencing means that model is tight coupled to actual entiuty, not just position. Enables shhallow cloning.
-All interfaces now uses int index to that world
-Creating the World Running the Model 
-
-Testing:
-
->test world are created
->test that world clones ok
->test that clones can be changed independently and share no refs
-
->test that entities are indexed ok
-
-
-There is a possibility that (world index) is confused with old trader/commodity index.
-Only places where this happens legitimately is:
->capitalists dictionary
->looping traders in Trader.
-
-
->RESULTS
-Obviously capitalism leads to inequality since capitalists get a % of the non-capitalists. If its in a hierarchy even more so.
-The commodity round robin is very optimal. The most optimal is actually a complex problem. Developing trading strategies is a side issue.
-
-
->Model Doc
->Market
-List of commodities
-List of traders
-
->Commodities
-have a type
-Magic type for people (traders)
-
->Traders
-have a desire for each commodity
-
->Desire is either lookup for basic coms
- or 50% of satifaction of trader
-
->Satisfaction (ie success in getting what you desire) is the currency.
-Satisfaction is sum of desire for portfolio.
-Capitalists get a share of satisfaction of traders they own (what does this mean? At moment they benefit from their subordinate desires?)
-
-
-Note: 1 good thing is is Trader encapsulates all Trader stuff like desire for traders!
-? should commodity do desireFor tho rather than Trader? Or where else should it be?
->old problem of where does the glue between objects go?
-
-=TODO
-
->Change trading so Portfolios can be different sizes. Then add Capitalists w/o removing commodities
->Then can create a hierarchy of capitalists and see the flow of satisfaction.
-
->Introduce currency somehow so can get pricing to really watch a free market model.
->Currently capitalists get 50% of the satisfaction. More realistic would be have a flow commodities from producers to consumers.
-
 
 >desire profile must be more complex for traders as much take some its value!
 So desire profile must be based upon the state of the target
@@ -97,5 +19,3 @@ So desire profile must be based upon the state of the target
 so comm decides on contact?
 
 >Would create desire profile on contact. BUT makes very difficult to recreate as order of exposer will change and so pick off different rnd #.
-
->
