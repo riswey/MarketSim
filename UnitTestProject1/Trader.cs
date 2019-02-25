@@ -13,24 +13,25 @@ namespace Traders
     [TestClass]
     public class TraderTests
     {
+        /*
         [TestInitialize()]
         public void Initialize()
         {
             //This is shit
             //we should inject bank
-            Bank.world = new Dictionary<int, Entity>();
+            World.world = new Dictionary<int, Entity>();
 
             for (int i=0;i<9;i++)
             {
-                Bank.world[i] = new Entity(1);
+                World.world[i] = new Entity(1);
             }
 
             double[] dp = new double[] { 0.1, 0.2, 0.3 };
 
-            Bank.world[9] = new Trader(new int[] { 0, 1 }, dp);
-            Bank.world[10] = new Trader(new int[] { 2, 3 }, dp);
-            Bank.world[11] = new Trader(new int[] { 4, 5 }, dp);
-            Bank.world[12] = new Trader(new int[] { 6, 7 }, dp);
+            World.world[9] = new Trader(new int[] { 0, 1 }, dp);
+            World.world[10] = new Trader(new int[] { 2, 3 }, dp);
+            World.world[11] = new Trader(new int[] { 4, 5 }, dp);
+            World.world[12] = new Trader(new int[] { 6, 7 }, dp);
 
             //Note: bit shakey if a mistake is made then ID++ goes out of sync with external
 
@@ -39,15 +40,15 @@ namespace Traders
         [TestCleanup()]
         public void Cleanup()
         {
-            Bank.world.Clear();
+            World.world.Clear();
         }
 
         [TestMethod]
         public void TraderSetUpTest()
         {
             //All entities are type 1
-            Trader t1 = Bank.world[10].Cast<Trader>();
-            Trader t2 = Bank.world[11].Cast<Trader>();
+            Trader t1 = World.world[10].Cast<Trader>();
+            Trader t2 = World.world[11].Cast<Trader>();
 
             Assert.AreEqual(t1.DesireFor(1), 0.2, "Desire wrong");
 
@@ -56,8 +57,8 @@ namespace Traders
         [TestMethod]
         public void TraderTakeRelease()
         {
-            Trader t1 = Bank.world[10].Cast<Trader>();
-            Trader t2 = Bank.world[11].Cast<Trader>();
+            Trader t1 = World.world[10].Cast<Trader>();
+            Trader t2 = World.world[11].Cast<Trader>();
 
             Assert.AreEqual(2, t1.portfolio.Count, "Count wrong after take");
             Assert.AreEqual(2, t2.portfolio.Count, "Count wrong after take");
@@ -81,8 +82,8 @@ namespace Traders
         [TestMethod]
         public void AddCapitalist()
         {
-            Trader t1 = Bank.world[10].Cast<Trader>();
-            Trader t2 = Bank.world[11].Cast<Trader>();
+            Trader t1 = World.world[10].Cast<Trader>();
+            Trader t2 = World.world[11].Cast<Trader>();
 
             int t2size = t2.portfolio.Count;
 
@@ -99,10 +100,10 @@ namespace Traders
         {
             //Each have 3 type 1 entities with dp 0.2
 
-            Trader t0 = Bank.world[9].Cast<Trader>();
-            Trader t1 = Bank.world[10].Cast<Trader>();
-            Trader t2 = Bank.world[11].Cast<Trader>();
-            Trader t3 = Bank.world[12].Cast<Trader>();
+            Trader t0 = World.world[9].Cast<Trader>();
+            Trader t1 = World.world[10].Cast<Trader>();
+            Trader t2 = World.world[11].Cast<Trader>();
+            Trader t3 = World.world[12].Cast<Trader>();
 
             Assert.IsTrue(Math.Round(t0.Satisfaction(), 5) == 0.4);  //weird rounding error
             Assert.IsTrue(Math.Round(t1.Satisfaction(), 5) == 0.4);  //weird rounding error
@@ -226,5 +227,7 @@ namespace Traders
             
         }
         */
+        
     }
+    
 }

@@ -7,38 +7,28 @@ using System.Threading.Tasks;
 namespace Traders
 {
 
-    public class Entity : ICloneable
+    public class Entity: ICloneable
     {
-        public const int FREE = -1;
-
-        static int ID = 0;
-        public int index { get; } = ID++;
-
+        public int index { get; set; }
         public int type { get; set; }
-        public int owner { get; set; } = FREE;
+        public Entity owner { get; set; }
 
-        public Entity(int type, int owner)
+        public Entity(int type)
         {
             this.type = type;
-            this.owner = owner;
         }
-
+        
         //For Cloning
-        protected Entity(Entity c)
+        protected Entity(Entity e)
         {
-            this.index = c.index;
-            this.type = c.type;
-            this.owner = c.owner;
+            this.index = e.index;
+            this.type = e.type;
         }
 
         public virtual object Clone()
         {
             return new Entity(this);
         }
-
-        public T Cast<T>() where T: Entity {
-            return (T) this; 
-        }
-
+        
     }
 }

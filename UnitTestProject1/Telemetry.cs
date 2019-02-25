@@ -14,15 +14,15 @@ namespace UnitTestProject1
         public void Gini()
         {
             List<double> values = new List<double>() { 0.1, 0.2, 0.3, 0.4 };
-
-            double res = Market.Gini(values);
+            /*
+            double res = world.Gini(values);
 
             Assert.IsTrue(res == 0);
 
             List<double> v1 = new List<double>() { 0.1, 0.15, 0.17, 0.4 };
 
             Debug.WriteLine("gini " + Market.Gini(v1));
-
+            */
         }
     }
 }

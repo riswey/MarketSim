@@ -15,13 +15,8 @@ namespace Traders
 
         public static bool ExecuteOrders()
         {
-            foreach (Order order in Order.collection)
-            {
-                order.Execute();
-            }
-
+            Order.collection.ForEach(o => o.Execute());
             ClearOrders();
-
             return true;
         }
 
@@ -30,14 +25,14 @@ namespace Traders
             Order.collection.Clear();
         }
 
-        public int t1;
-        public int t2;
-        public int c1;
-        public int c2;
+        public Trader t1;
+        public Trader t2;
+        public Entity e1;
+        public Entity e2;
 
         public void Execute()
         {
-            Trader.Exchange(t1, t2, c1, c2);            
+            Trader.Exchange(t1, t2, e1, e2);            
         }
 
     }

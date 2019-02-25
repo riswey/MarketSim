@@ -17,38 +17,17 @@ namespace Traders
     public partial class Market
     {
         public List<Entity> entities;
-        //Traders is just to help with looping
-        public List<Trader> traders;
 
-        public static Random rnd = new Random();
-
-        static public void WorldGenerator(out Dictionary<int, Entity> world, int n_traders, int n_com_types, int pf_size)
+        List<Trader> traders
         {
-            world = new Dictionary<int, Entity >();
-
-            int n_commodities = n_traders * pf_size, type;
-
-            //Create commodities
-            Entity e;
-            for (int i = 0; i < n_commodities; i++)
+            get
             {
-                type = rnd.Next(n_com_types);
-                e = new Entity(type);
-                world[e.index] = e;
-            }
-
-            //Traders need world bound to static reference
-            Bank.SetBankWorld(world);
-
-            //Create traders
-            for (int i = 0; i < n_traders; i++)
-            {
-                double[] dp = Trader.RandomDesireProfile(rnd, n_com_types);
-                int[] portfolio = Trader.RangePortfolio(i* pf_size, pf_size);
-                Trader t = new Trader(portfolio, dp);
-                world[t.index] = t;
+                return (List<Trader>)entities.Where(e => e.type == Trader.TRADER_TYPE);
             }
         }
+        
+        public static Random rnd = new Random();
+
 
         static public void AddCapitalists(Dictionary<int, Entity> world, int[] capitalists)
         {
@@ -57,7 +36,7 @@ namespace Traders
             Dictionary<int, int> tradermap = new Dictionary<int, int>();
 
             int c = 0;
-            foreach (KeyValuePair<int, Entity> e in Bank.world)
+            foreach (KeyValuePair<int, Entity> e in World.singleInstance.world)
             {
                 if (e.Value.type == Trader.TRADER_TYPE)
                 {
@@ -75,7 +54,7 @@ namespace Traders
             }
 
         }
-
+        /*
         public static List<Entity> ListRandomCommodities(Random rnd, int size, int n_com_types)
         {
             List<Entity> coms = new List<Entity>();
@@ -85,12 +64,13 @@ namespace Traders
             }
             return coms;
         }
+        */
 
         public Market(Dictionary<int, Entity> world)
         {
             //Create convenience lists of world
             entities = new List<Entity>();
-            traders = new List<Trader>();
+
             foreach(KeyValuePair<int, Entity> e in world)
             {
                 entities.Add(e.Value);
@@ -105,9 +85,9 @@ namespace Traders
         {
             //Every trader meets every trader
             //triangle or do in reverse also?
-            foreach (KeyValuePair<int, Entity> a in Bank.world)
+            foreach (KeyValuePair<int, Entity> a in World.singleInstance.world)
             {
-                foreach (KeyValuePair<int, Entity> b in Bank.world)
+                foreach (KeyValuePair<int, Entity> b in World.singleInstance.world)
                 {
                     if (a.Value.Equals(b.Value)) continue;
 

@@ -11,53 +11,84 @@ namespace Traders
         static void Main(string[] args)
         {
             const int N_TRADERS = 10;
-            const int N_COM_TYPES = 5;
-            const int SIZE_COM_PORTFOLIO = 10;
-            const int LOOPS = 5;
-            //Owner/Worker dictionary
-            //e.g. 9{6{0,1},7{2,3},8{4,5}}
-            int[] capitalists = new int[] { 
-                6,0,
-                6,1,
-                7,2,
-                7,3,
-                8,4,
-                8,5,
-                9,6,
-                9,7,
-                9,8
-            };
+            const int N_TYPES = 5;
+            const int SIZE_PORTFOLIO = 10;
+            const int LOOPS = 3;
+
+            World world = new World();
 
             //Make the world & clone for each run replicate
-            Dictionary<int, Entity> world;
-            Market.WorldGenerator(out world, N_TRADERS, N_COM_TYPES, SIZE_COM_PORTFOLIO);
+            List<Entity> rawdata = World.WorldGenerator(N_TRADERS, N_TYPES, SIZE_PORTFOLIO);
 
-            
-            Console.WriteLine("\n#Original##################################\n");
-            Dictionary<int, Entity> world1 = world.Clone();
-            Bank.SetBankWorld(world1);
-            Market market1 = new Market(world1);
-            //Console.WriteLine(market1.printDP());
-            Console.WriteLine(market1.printOwners());
-            Console.WriteLine(market1.printPortfolios());
-            Console.WriteLine(market1.PrintSatisfaction());
-            Console.WriteLine("Gini: " + market1.WorldGini());
-            market1.Run(LOOPS, Market.MeetRoundRobin, TraderBehaviour.MutualMaxSwap);
+            world.LoadData(rawdata);
+            //Console.WriteLine(Report.printOwners(world.entities));
+            //Console.WriteLine(Report.printPortfolios(world.traders));
+            Console.WriteLine(Report.PrintSatisfaction(world.traders));
 
-            Console.WriteLine("\n#With Capitalists##################################\n");
-            Dictionary<int, Entity> world2 = world.Clone();
-            Bank.SetBankWorld(world2);
+            Console.WriteLine("\n#Barter##################################\n");
 
-            Market.AddCapitalists(world2, capitalists);
+            Console.WriteLine("0\t" + Report.Stats(world.traders));
+            Extensions.Loop(LOOPS, (i) => 
+            {
+                world.entities.AllPairs().ForEach(pair =>
+                {
+                    TraderBehaviour.SimpleCompareEntities(pair);
+                });
 
-            Market market2 = new Market(world2);
-            //Console.WriteLine(market2.printDP());
-            Console.WriteLine(market2.printOwners());
-            Console.WriteLine(market2.printPortfolios());
-            Console.WriteLine(market2.PrintSatisfaction());
-            Console.WriteLine("Gini: " + market2.WorldGini());
-            market2.Run(LOOPS, Market.MeetRoundRobin, TraderBehaviour.MutualMaxSwap);
+                Console.WriteLine( (i+1) + "\t" + Report.Stats(world.traders));
+            });
+            Console.WriteLine(Report.PrintSatisfaction(world.traders));
 
+            Console.WriteLine("\n#Sacrifice##################################\n");
+            //reset
+            world.LoadData(rawdata);
+            Console.WriteLine("0\t" + Report.Stats(world.traders));
+            Extensions.Loop(LOOPS, (i) =>
+            {
+                world.entities.AllPairs().ForEach(pair =>
+                {
+                    TraderBehaviour.Sacrifice(pair);
+                });
+
+                Console.WriteLine((i + 1) + "\t" + Report.Stats(world.traders));
+            });
+            Console.WriteLine(Report.PrintSatisfaction(world.traders));
+
+            Console.WriteLine("\n#GivingPoor##################################\n");
+            //reset
+            world.LoadData(rawdata);
+            Console.WriteLine("0\t" + Report.Stats(world.traders));
+            Extensions.Loop(LOOPS, (i) =>
+            {
+                world.entities.AllPairs().ForEach(pair =>
+                {
+                    TraderBehaviour.GivingPoor(pair);
+                });
+
+                Console.WriteLine((i + 1) + "\t" + Report.Stats(world.traders));
+            });
+            Console.WriteLine(Report.PrintSatisfaction(world.traders));
+
+
+            Console.WriteLine("\n#MaxSwap##################################\n");
+
+            //reset
+            world.LoadData(rawdata);
+
+            Console.WriteLine("0\t" + Report.Stats(world.traders));
+            Extensions.Loop(LOOPS, (i) =>
+            {
+                world.traders.AllPairs().ForEach(pair =>
+                {
+                    TraderBehaviour.MutualMaxSwap(pair);
+                });
+
+                Console.WriteLine((i + 1) + "\t" + Report.Stats(world.traders));
+            });
+
+            Console.WriteLine(Report.PrintSatisfaction(world.traders));
+
+        
             Console.ReadLine();
         }
     }

@@ -7,31 +7,18 @@ using System.Threading.Tasks;
 namespace Traders
 {
 
-    public partial class Trader: Entity, ICloneable
+    public partial class Trader : Entity, ICloneable
     {
         public const int TRADER_TYPE = -1;
 
-        double[] desireProfile;
-        public List<int> portfolio { get; } = new List<int>();
+        public double[] desireProfile { get; set; }
+        public List<Entity> portfolio { get; set; } = new List<Entity>();
 
-        public Trader(int[] portfolio, double[] dp): base(TRADER_TYPE)
+        public Trader(double[] dp) : base(TRADER_TYPE)
         {
             this.desireProfile = dp;
-            foreach(int c in portfolio)
-            {
-                Take(c);
-            }
-        }
-
-        //Clone
-        protected Trader(Trader t): base(t)
-        {
-            this.desireProfile = new double[t.desireProfile.Length];
-            t.desireProfile.CopyTo(this.desireProfile, 0);
-
-            int[] arr_pf = new int[t.portfolio.Count];
-            t.portfolio.CopyTo(arr_pf);
-            this.portfolio = arr_pf.ToList();
+            this.portfolio = portfolio;
+            portfolio.ForEach(e => Take(e));
         }
 
         public static double[] RandomDesireProfile(Random rnd, int n_com_types)
@@ -44,42 +31,26 @@ namespace Traders
             return dp;
         }
 
-        public static int[] RangePortfolio(int start, int length)
-        {
-            int[] pf = new int[length];
-            for (int i = 0; i < length; i++)
+        public double DesireFor(Entity e)
+        {            
+            if (e.type != TRADER_TYPE)
             {
-                pf[i] = start + i;
-            }
-            return pf;
-        }
-
-        public double DesireFor(int index)
-        {
-            Entity c = Bank.Index2Entity<Entity>(index);
-            
-            if (c.type != TRADER_TYPE)
-            {
-                return desireProfile[c.type];
+                return desireProfile[e.type];
             }
             else
             {
                 //TODO: BEWARE: Trader -> Trader can form a loop
                 //Half the satisfaction has been set aside for me already so this is mine 
-                return c.Cast<Trader>().Satisfaction();
+                return (e as Trader).Satisfaction();
             }
         }
 
         public double Satisfaction()
         {
-            double sum = 0.0;
-            foreach(int c in portfolio)
-            {
-                sum += DesireFor(c);
-            }
+            double sum = portfolio.Sum(e => DesireFor(e));
 
             //If has a capitalist then half will go to them so return only half
-            if (owner == Trader.FREE)
+            if (owner == null)
             {
                 return sum;
             } else {
@@ -88,198 +59,42 @@ namespace Traders
             }
         }
 
-        //Needs to be able public Take so can add commodities in setup
-
-        //TODO have take auto release the owner
-        public bool Take(int idx)
+        public bool Take(Entity e)
         {
-            Entity c = Bank.Index2Entity<Entity>(idx);
-
-            if (c.owner == FREE)
-            {
-                c.owner = this.index;
-
-                portfolio.Add(idx);
-            }
-            else
-            {
-                return false;
-            }
-
+            //can't take something that still owned
+            if (e.owner != null) return false;
+            e.owner = this;
+            portfolio.Add(e);
             return true;
         }
 
-        bool Release(int index)
+        public bool Release(Entity e)
         {
-            Bank.Index2Entity<Entity>(index).owner = FREE;
-            return portfolio.Remove(index);
+            e.owner = null;
+            return portfolio.Remove(e);
         }
 
-        public static void Exchange(int t1, int t2, int c1, int c2)
+        public static void Exchange(Trader t1, Trader t2, Entity e1, Entity e2)
         {
-            Bank.Index2Entity<Trader>(t1).Release(c1);
-            Bank.Index2Entity<Trader>(t2).Release(c2);
-            Bank.Index2Entity<Trader>(t1).Take(c2);
-            Bank.Index2Entity<Trader>(t2).Take(c1);
+            t1.Release(e1);
+            t2.Release(e2);
+            t1.Take(e2);
+            t2.Take(e1);
         }
 
-        public object Clone()
+
+        //Shallow Cloning
+        protected Trader(Trader t) : base(t)
+        {
+            this.desireProfile = new double[t.desireProfile.Length];
+            t.desireProfile.CopyTo(this.desireProfile, 0);
+        }
+
+        public virtual object Clone()
         {
             return new Trader(this);
         }
 
-        public static bool IsTrader(Entity e)
-        {
-            return e.type == Trader.TRADER_TYPE;
-        }
 
-        public static bool IsType(Entity a, Entity b, out Trader t1, out Trader t2)
-        {
-            if (IsTrader(a) && IsTrader(b))
-            {
-                t1 = (Trader)a;
-                t2 = (Trader)b;
-                return true;
-            }
-            t1 = null;
-            t2 = null;
-
-            return false;
-        }
-
-
-
-        /*
-        //REVIEW THESE
-
-        public void SortPortfolio()
-        {
-            portfolio.Sort(delegate (I_Commodity c1, I_Commodity c2)
-            {
-                double d1 = desireFor(c1);
-                double d2 = desireFor(c2);
-
-                if (d1 == d2) return 0;
-                if (d1 < d2) return -1;
-                return 1;
-            });
-        }
-
-        public List<I_Commodity> offerCommodity(I_Commodity com)
-        {
-            List<I_Commodity> myoffers = new List<I_Commodity>();
-
-            double target = desireFor(com);
-
-            foreach (I_Commodity c in portfolio)
-            {
-                if (target >= desireFor(c))
-                {
-                    myoffers.Add(c);
-                }
-            }
-
-            return myoffers;
-        }
-
-        //TODO: return a list, pass back
-        public I_Commodity considerOffers(List<I_Commodity> ls)
-        {
-            //no offers
-            if (ls.Count == 0) return null;
-
-            int select = 0;
-            double max = desireFor(ls[0]);
-
-            for (int i = 1; i < ls.Count; i++)
-            {
-                if (desireFor(ls[i]) > max)
-                {
-                    select = i;
-                    max = desireFor(ls[i]);
-                }
-            }
-
-            //find lowest and see if worth swapping
-            if (max > desireFor(portfolio[0]))
-            {
-                //present for swap
-                return portfolio[0];
-            }
-            return null;
-        }
-
-        public static void meet(Trader t, Trader u)
-        {
-            //can't meet self
-            if (t.Equals(u)) return;
-            //show around each others store
-            t.tradePortfolioTo(u);
-            u.tradePortfolioTo(t);
-        }
-
-        public void tradePortfolioTo(Trader t)
-        {
-            List<I_Commodity> ls;
-
-            //list my own stock. My portfolio will be changed by the operation
-            var pf = new Commodity[portfolio.Count];
-            portfolio.CopyTo(pf);
-
-            foreach (I_Commodity c in pf)
-            {
-                //Offer all my commodities 
-                ls = t.offerCommodity(c);
-                //give offers to customer
-                I_Commodity swap = considerOffers(ls);
-
-                if (swap != null)
-                {
-                    bool okme = release(c);
-                    bool okt = t.release(swap);
-                    if (okme && okt)
-                    {
-                        take(swap);
-                        t.take(c);
-                    } else if (okme) {
-                        //I released but t didn't so pick up commodity again
-                        take(c);
-                    }
-                }
-            }
-        }
-        */
-    }
-
-    partial class Trader
-    {
-        public string PrintDesireProfile(bool header = false)
-        {
-            string str = "";
-            if (header)
-            {
-                for (int i = 0; i < desireProfile.Length; i++)
-                {
-                    str += "Type" + i + "\t";
-                }
-                return str;
-            }
-
-            str = index + ":\t";
-            foreach (double d in desireProfile)
-            {
-                str += Math.Round(d * 1000) + "\t";
-            }
-            return str;
-        }
-
-        public string PrintPortfolioI(int index)
-        {
-            if (index >= portfolio.Count) return "";
-
-            int idx = portfolio[index];
-            Entity c = Bank.Index2Entity<Entity>(idx);
-            return c.type + "(" + Math.Round(DesireFor(idx) * 1000) + ")";
-        }
     }
 }

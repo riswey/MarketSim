@@ -10,7 +10,7 @@ namespace Traders
     {
         int skill { get; set; }        //I make this type of commodity
 
-        Worker(int skill, int[] portfolio, double[] dp): base(portfolio, dp) {
+        Worker(int skill, int[] portfolio, double[] dp, int owner): base(portfolio, dp, owner) {
             this.skill = skill;
         }
 
@@ -26,10 +26,10 @@ namespace Traders
 
         public void Work()
         {
-            Entity e = new Entity(this.skill);
+            Entity e = new Entity(this.skill, Entity.FREE);
 
             portfolio.Add(e.index);
-            Bank.AddEntity(e);
+            World.singleInstance.AddEntity(e);
         }
 
     }
